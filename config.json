@@ -1,0 +1,23 @@
+{
+  "api_key_env": "OPENAI_KEY",
+  "base_url": "https://api.deepseek.com",
+  "model": "deepseek-reasoner",
+  "temperature": 0.2,
+  "top_p": 1,
+  "timeout": 700,
+  "max_workers": 10,
+  "input_dir": "code_input",
+  "output_dir": "code_output",
+  "split_dir": "temp/code_split",
+  "split_output_dir": "temp/code_split_output",
+  "system_prompt_path": "system_prompt.txt",
+  "file_extensions": [
+    ".c",
+    ".h",
+    ".cpp"
+  ],
+  "Large_file_split_threshold": 15000,
+  "split_max_token": 10000,
+  "split_min_token": 5000,
+  "encoding": "utf-8",
+}
