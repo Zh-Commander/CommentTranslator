@@ -1,0 +1,3 @@
+split_before_line=280, chunk_start_line=1, chunk_end_line=279, chunk_size=18208, boundary_type=empty
+split_before_line=670, chunk_start_line=280, chunk_end_line=669, chunk_size=19742, boundary_type=empty
+final_chunk_start_line=670, final_chunk_end_line=1000, chunk_size=14604

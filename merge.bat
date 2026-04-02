@@ -1,0 +1,2 @@
+python merge_split_output.py
+pause

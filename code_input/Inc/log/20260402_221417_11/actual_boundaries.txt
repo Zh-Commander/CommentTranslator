@@ -1,0 +1,13 @@
+split_before_line=291, chunk_start_line=1, chunk_end_line=290, chunk_size=19012, boundary_type=empty
+split_before_line=528, chunk_start_line=291, chunk_end_line=527, chunk_size=18891, boundary_type=empty
+split_before_line=701, chunk_start_line=528, chunk_end_line=700, chunk_size=19923, boundary_type=empty
+split_before_line=755, chunk_start_line=701, chunk_end_line=754, chunk_size=3340, boundary_type=empty
+split_before_line=835, chunk_start_line=755, chunk_end_line=834, chunk_size=18115, boundary_type=empty
+split_before_line=1188, chunk_start_line=835, chunk_end_line=1187, chunk_size=19485, boundary_type=empty
+split_before_line=1484, chunk_start_line=1188, chunk_end_line=1483, chunk_size=15850, boundary_type=empty
+split_before_line=1882, chunk_start_line=1484, chunk_end_line=1881, chunk_size=19945, boundary_type=empty
+split_before_line=2270, chunk_start_line=1882, chunk_end_line=2269, chunk_size=19849, boundary_type=empty
+split_before_line=2649, chunk_start_line=2270, chunk_end_line=2648, chunk_size=19142, boundary_type=empty
+split_before_line=3022, chunk_start_line=2649, chunk_end_line=3021, chunk_size=17766, boundary_type=empty
+split_before_line=3475, chunk_start_line=3022, chunk_end_line=3474, chunk_size=19443, boundary_type=empty
+final_chunk_start_line=3475, final_chunk_end_line=3929, chunk_size=17650

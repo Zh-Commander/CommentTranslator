@@ -1,11 +1,11 @@
 {
   "api_key_env": "OPENAI_KEY",
-  "base_url": "https://api.deepseek.com",
-  "model": "deepseek-reasoner",
+  "base_url": "https://modelservice.jdcloud.com/coding/openai/v1",
+  "model": "GLM-5",
   "temperature": 0.2,
   "top_p": 1,
   "timeout": 700,
-  "max_workers": 10,
+  "max_workers": 3,
   "input_dir": "code_input",
   "output_dir": "code_output",
   "split_dir": "temp/code_split",
@@ -16,8 +16,8 @@
     ".h",
     ".cpp"
   ],
-  "Large_file_split_threshold": 15000,
-  "split_max_token": 10000,
-  "split_min_token": 5000,
+  "Large_file_split_threshold": 20000,
+  "split_max_token": 20000,
+  "split_min_token": 10000,
   "encoding": "utf-8",
 }

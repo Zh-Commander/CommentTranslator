@@ -24,6 +24,7 @@ except ImportError as exc:
 SCRIPT_DIR = Path(__file__).resolve().parent
 CONFIG_PATH = SCRIPT_DIR / "config.json"
 TRAILING_COMMA_PATTERN = re.compile(r",(?=\s*[}\]])")
+C_CODE_BLOCK_PATTERN = re.compile(r"```c\s*\n?(.*?)```", re.DOTALL | re.IGNORECASE)
 
 
 class Translator:
@@ -57,21 +58,15 @@ class Translator:
         self.timeout = config.get("timeout", 600)
 
     @staticmethod
-    def strip_markdown_fence(text: str) -> str:
-        lines = text.splitlines()
-        if not lines:
+    def extract_c_code_block(text: str) -> str:
+        match = C_CODE_BLOCK_PATTERN.search(text)
+        if not match:
             return text
 
-        if len(lines[0]) >= 3 and lines[0][:3] == "```":
-            lines = lines[1:]
-
-        if lines and len(lines[-1]) >= 3 and lines[-1][:3] == "```":
-            lines = lines[:-1]
-
-        result = "\n".join(lines)
-        if text.endswith("\n") and lines:
-            result += "\n"
-        return result
+        code = match.group(1)
+        if text.endswith("\n") and not code.endswith("\n"):
+            code += "\n"
+        return code
 
     def load_system_prompt(self) -> str:
         if not self.system_prompt_path.is_file():
@@ -108,7 +103,7 @@ class Translator:
         )
 
         output_text = response.choices[0].message.content or ""
-        output_text = self.strip_markdown_fence(output_text)
+        output_text = self.extract_c_code_block(output_text)
         output_file = self.build_output_path(input_file)
         output_file.parent.mkdir(parents=True, exist_ok=True)
         output_file.write_text(output_text, encoding="utf-8")

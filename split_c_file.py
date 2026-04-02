@@ -2,247 +2,301 @@ from __future__ import annotations
 
 import argparse
 import sys
+from datetime import datetime
 from pathlib import Path
-from typing import List
 
 
 class SplitError(Exception):
     pass
 
 
-class CState:
-    def __init__(self) -> None:
-        self.in_block_comment = False
-        self.in_string = False
-        self.in_char = False
-        self.escape = False
-        self.brace_level = 0
-        self.extern_c_level = 0
+
+def _line_size(line: str, encoding: str) -> int:
+    return len(line.encode(encoding))
 
 
-def is_extern_c_open_line(line: str) -> bool:
-    stripped = line.strip()
-    return stripped in {'extern "C" {', 'extern "C"{'}
 
+def _collect_boundaries(lines: list[str]) -> tuple[list[int], list[int]]:
+    """Return two boundary lists.
 
-def is_extern_c_close_line(line: str) -> bool:
-    return line.strip() == "}"
+    - empty_boundaries: split-before indexes on empty lines outside block comments.
+    - fallback_boundaries: split-before indexes between two lines, where the boundary
+      itself is outside block comments.
+    """
+    empty_boundaries: list[int] = []
+    fallback_boundaries: list[int] = []
+    in_block_comment = False
 
+    for index, line in enumerate(lines):
+        if not in_block_comment:
+            fallback_boundaries.append(index)
+            if line.strip() == "":
+                empty_boundaries.append(index)
 
-def update_state_with_line(line: str, state: CState) -> None:
-    ignore_extern_c_open = (
-        not state.in_block_comment
-        and not state.in_string
-        and not state.in_char
-        and is_extern_c_open_line(line)
-    )
-    ignore_extern_c_close = (
-        not state.in_block_comment
-        and not state.in_string
-        and not state.in_char
-        and state.brace_level == 0
-        and state.extern_c_level > 0
-        and is_extern_c_close_line(line)
-    )
+        i = 0
+        length = len(line)
+        in_string: str | None = None
 
-    i = 0
-    while i < len(line):
-        ch = line[i]
-        nxt = line[i + 1] if i + 1 < len(line) else ""
+        while i < length:
+            ch = line[i]
+            nxt = line[i + 1] if i + 1 < length else ""
 
-        if state.in_block_comment:
-            if ch == "*" and nxt == "/":
-                state.in_block_comment = False
-                i += 2
-            else:
+            if in_string is not None:
+                if ch == "\\":
+                    i += 2
+                    continue
+                if ch == in_string:
+                    in_string = None
                 i += 1
-            continue
+                continue
 
-        if state.in_string:
-            if state.escape:
-                state.escape = False
-            elif ch == "\\":
-                state.escape = True
-            elif ch == '"':
-                state.in_string = False
+            if in_block_comment:
+                if ch == "*" and nxt == "/":
+                    in_block_comment = False
+                    i += 2
+                    continue
+                i += 1
+                continue
+
+            if ch == '"' or ch == "'":
+                in_string = ch
+                i += 1
+                continue
+
+            if ch == "/" and nxt == "*":
+                in_block_comment = True
+                i += 2
+                continue
+
+            if ch == "/" and nxt == "/":
+                break
+
             i += 1
-            continue
 
-        if state.in_char:
-            if state.escape:
-                state.escape = False
-            elif ch == "\\":
-                state.escape = True
-            elif ch == "'":
-                state.in_char = False
-            i += 1
-            continue
+    return empty_boundaries, fallback_boundaries
 
-        if ch == "/" and nxt == "*":
-            state.in_block_comment = True
-            i += 2
-            continue
 
-        if ch == "/" and nxt == "/":
+
+def _build_prefix_sizes(lines: list[str], encoding: str) -> list[int]:
+    prefix_sizes = [0]
+    total = 0
+    for line in lines:
+        total += _line_size(line, encoding)
+        prefix_sizes.append(total)
+    return prefix_sizes
+
+
+
+def _range_size(prefix_sizes: list[int], start: int, end: int) -> int:
+    return prefix_sizes[end] - prefix_sizes[start]
+
+
+
+def _determine_actual_boundaries(
+    lines: list[str],
+    empty_boundaries: list[int],
+    fallback_boundaries: list[int],
+    max_size: int,
+    min_size: int,
+    encoding: str,
+) -> list[int]:
+    if max_size <= 0:
+        raise SplitError("max_size must be greater than 0")
+    if min_size < 0:
+        raise SplitError("min_size must be greater than or equal to 0")
+    if min_size > max_size:
+        raise SplitError("min_size cannot be greater than max_size")
+
+    prefix_sizes = _build_prefix_sizes(lines, encoding)
+    total_size = prefix_sizes[-1]
+
+    if total_size <= max_size:
+        return []
+
+    if not fallback_boundaries:
+        raise SplitError("no valid split boundaries found")
+
+    boundaries: list[int] = []
+    start = 0
+    empty_index = 0
+    fallback_index = 0
+
+    while start < len(lines):
+        remaining_size = _range_size(prefix_sizes, start, len(lines))
+        if remaining_size <= max_size:
             break
 
-        if ch == '"':
-            state.in_string = True
-            state.escape = False
-            i += 1
+        while empty_index < len(empty_boundaries) and empty_boundaries[empty_index] <= start:
+            empty_index += 1
+        while fallback_index < len(fallback_boundaries) and fallback_boundaries[fallback_index] <= start:
+            fallback_index += 1
+
+        best_empty: int | None = None
+        scan_empty_index = empty_index
+        while scan_empty_index < len(empty_boundaries):
+            boundary = empty_boundaries[scan_empty_index]
+            if _range_size(prefix_sizes, start, boundary) > max_size:
+                break
+            best_empty = boundary
+            scan_empty_index += 1
+
+        if best_empty is not None:
+            boundaries.append(best_empty)
+            start = best_empty
+            empty_index = scan_empty_index
             continue
 
-        if ch == "'":
-            state.in_char = True
-            state.escape = False
-            i += 1
-            continue
+        fallback_boundary: int | None = None
+        scan_fallback_index = fallback_index
+        while scan_fallback_index < len(fallback_boundaries):
+            boundary = fallback_boundaries[scan_fallback_index]
+            chunk_size = _range_size(prefix_sizes, start, boundary)
+            if chunk_size > max_size:
+                fallback_boundary = boundary
+                break
+            scan_fallback_index += 1
 
-        if ch == "{":
-            if ignore_extern_c_open:
-                state.extern_c_level += 1
-                ignore_extern_c_open = False
-            else:
-                state.brace_level += 1
-        elif ch == "}":
-            if ignore_extern_c_close:
-                state.extern_c_level -= 1
-                ignore_extern_c_close = False
-            else:
-                state.brace_level -= 1
-                if state.brace_level < 0:
-                    raise SplitError("Encountered unmatched closing brace while scanning the file.")
+        if fallback_boundary is None:
+            break
 
-        i += 1
+        if fallback_boundary <= start:
+            raise SplitError(
+                f"cannot split chunk starting at line {start + 1} within max_size={max_size}"
+            )
 
+        boundaries.append(fallback_boundary)
+        start = fallback_boundary
+        fallback_index = scan_fallback_index
 
-def collect_candidate_boundaries(lines: List[str]) -> List[int]:
-    state = CState()
-    boundaries = [0]
-
-    for index, line in enumerate(lines, start=1):
-        line_is_empty = line.strip() == ""
-        line_is_valid_boundary = (
-            line_is_empty
-            and not state.in_block_comment
-            and state.brace_level == 0
-            and not state.in_string
-            and not state.in_char
-        )
-        if line_is_valid_boundary:
-            boundaries.append(index)
-
-        update_state_with_line(line, state)
-
-    if state.in_block_comment:
-        raise SplitError("The file ends inside a block comment.")
-    if state.in_string:
-        raise SplitError("The file ends inside a string literal.")
-    if state.in_char:
-        raise SplitError("The file ends inside a character literal.")
-    if state.brace_level != 0:
-        raise SplitError("The file ends with unmatched braces.")
-
-    if boundaries[-1] != len(lines):
-        boundaries.append(len(lines))
+    if boundaries:
+        last_start = boundaries[-1]
+        last_size = _range_size(prefix_sizes, last_start, len(lines))
+        if last_size < min_size:
+            boundaries.pop()
 
     return boundaries
 
 
-def build_line_offsets(lines: List[str], encoding: str) -> List[int]:
-    offsets = [0]
-    total = 0
-    for line in lines:
-        total += len(line.encode(encoding))
-        offsets.append(total)
-    return offsets
+
+def _build_log_dir(base_dir: Path) -> Path:
+    log_root = base_dir / "log"
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    log_dir = log_root / timestamp
+    counter = 1
+    while log_dir.exists():
+        log_dir = log_root / f"{timestamp}_{counter:02d}"
+        counter += 1
+    log_dir.mkdir(parents=True, exist_ok=False)
+    return log_dir
 
 
-def chunk_size(offsets: List[int], start_line: int, end_line: int) -> int:
-    return offsets[end_line] - offsets[start_line]
 
-
-def determine_actual_boundaries(
-    candidate_boundaries: List[int],
-    offsets: List[int],
-    min_size: int,
-    max_size: int,
-) -> List[int]:
-    if min_size < 0 or max_size <= 0:
-        raise SplitError("min_size must be >= 0 and max_size must be > 0.")
-    if min_size > max_size:
-        raise SplitError("min_size cannot be larger than max_size.")
-
-    actual = [candidate_boundaries[0]]
-    current_index = 0
-    last_index = len(candidate_boundaries) - 1
-
-    while current_index < last_index:
-        next_index = current_index + 1
-        best_index = None
-        first_oversized_index = None
-
-        while next_index <= last_index:
-            size = chunk_size(offsets, candidate_boundaries[current_index], candidate_boundaries[next_index])
-            if size <= max_size:
-                best_index = next_index
-                next_index += 1
-                continue
-
-            first_oversized_index = next_index
-            break
-
-        if best_index is not None:
-            chosen_index = best_index
-        elif first_oversized_index is not None:
-            chosen_index = first_oversized_index
-        else:
-            raise SplitError("Failed to determine the next split boundary.")
-
-        actual.append(candidate_boundaries[chosen_index])
-        current_index = chosen_index
-
-    if len(actual) >= 3:
-        last_size = chunk_size(offsets, actual[-2], actual[-1])
-        if last_size < min_size:
-            actual.pop(-2)
-
-    return actual
-
-
-def write_chunks(
-    lines: List[str],
-    boundaries: List[int],
+def _write_boundary_reports(
+    lines: list[str],
+    empty_boundaries: list[int],
+    fallback_boundaries: list[int],
+    boundaries: list[int],
     output_dir: Path,
-    source_path: Path,
     encoding: str,
-) -> List[Path]:
+) -> None:
+    prefix_sizes = _build_prefix_sizes(lines, encoding)
+
+    candidate_report = output_dir / "candidate_boundaries.txt"
+    fallback_report = output_dir / "fallback_boundaries.txt"
+    actual_report = output_dir / "actual_boundaries.txt"
+
+    candidate_lines = [f"{index + 1}\n" for index in empty_boundaries]
+    fallback_lines = [f"{index + 1}\n" for index in fallback_boundaries if index > 0]
+
+    actual_lines: list[str] = []
+    start = 0
+    empty_set = set(empty_boundaries)
+    for boundary in boundaries:
+        boundary_type = "empty" if boundary in empty_set else "fallback"
+        actual_lines.append(
+            f"split_before_line={boundary + 1}, chunk_start_line={start + 1}, chunk_end_line={boundary}, chunk_size={_range_size(prefix_sizes, start, boundary)}, boundary_type={boundary_type}\n"
+        )
+        start = boundary
+
+    actual_lines.append(
+        f"final_chunk_start_line={start + 1}, final_chunk_end_line={len(lines)}, chunk_size={_range_size(prefix_sizes, start, len(lines))}\n"
+    )
+
+    candidate_report.write_text("".join(candidate_lines), encoding=encoding)
+    fallback_report.write_text("".join(fallback_lines), encoding=encoding)
+    actual_report.write_text("".join(actual_lines), encoding=encoding)
+
+
+
+def _write_chunks(
+    lines: list[str],
+    boundaries: list[int],
+    input_path: Path,
+    output_dir: Path,
+    encoding: str,
+) -> list[Path]:
     output_dir.mkdir(parents=True, exist_ok=True)
-    created_files: List[Path] = []
-    stem = source_path.stem
-    suffix = source_path.suffix or ".c"
 
-    for part_index, (start, end) in enumerate(zip(boundaries, boundaries[1:]), start=1):
-        part_path = output_dir / f"{stem}.part{part_index}{suffix}"
-        part_path.write_text("".join(lines[start:end]), encoding=encoding)
-        created_files.append(part_path)
+    split_points = [0, *boundaries, len(lines)]
+    written_files: list[Path] = []
 
-    return created_files
+    width = max(3, len(str(len(split_points) - 1)))
+    for index in range(len(split_points) - 1):
+        start = split_points[index]
+        end = split_points[index + 1]
+        chunk_path = output_dir / f"{input_path.stem}.part{index}{input_path.suffix}"
+        chunk_path.write_text("".join(lines[start:end]), encoding=encoding)
+        written_files.append(chunk_path)
+
+    return written_files
+
 
 
 def split_c_file(
-    input_file: Path,
+    input_path: Path,
     output_dir: str | Path,
-    min_size: int,
-    max_size: int,
-    encoding: str,
-) -> List[Path]:
-    output_path = Path(output_dir)
-    lines = input_file.read_text(encoding=encoding).splitlines(keepends=True)
-    candidate_boundaries = collect_candidate_boundaries(lines)
-    offsets = build_line_offsets(lines, encoding)
-    actual_boundaries = determine_actual_boundaries(candidate_boundaries, offsets, min_size, max_size)
-    return write_chunks(lines, actual_boundaries, output_path, input_file, encoding)
+    *,
+    max_size: int = 10000,
+    min_size: int = 5000,
+    encoding: str = "utf-8",
+) -> list[Path]:
+    try:
+        text = input_path.read_text(encoding=encoding)
+    except UnicodeDecodeError as exc:
+        raise SplitError(f"failed to decode file with encoding {encoding}: {exc}") from exc
+    except OSError as exc:
+        raise SplitError(f"failed to read input file: {exc}") from exc
+
+    lines = text.splitlines(keepends=True)
+    if not lines:
+        raise SplitError("input file is empty")
+
+    empty_boundaries, fallback_boundaries = _collect_boundaries(lines)
+    boundaries = _determine_actual_boundaries(
+        lines,
+        empty_boundaries,
+        fallback_boundaries,
+        max_size,
+        min_size,
+        encoding,
+    )
+
+    try:
+        output_path = Path(output_dir)
+        written_files = _write_chunks(lines, boundaries, input_path, output_path, encoding)
+        log_dir = _build_log_dir(input_path.resolve().parent)
+        _write_boundary_reports(
+            lines,
+            empty_boundaries,
+            fallback_boundaries,
+            boundaries,
+            log_dir,
+            encoding,
+        )
+        return written_files
+    except OSError as exc:
+        raise SplitError(f"failed to write output files: {exc}") from exc
+
 
 
 def main() -> int:
