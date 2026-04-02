@@ -1,360 +1,448 @@
 #if (USE_HAL_TIM_REGISTER_CALLBACKS == 1)
-  // 以下是回调函数指针定义，用于用户自定义回调函数，而不是使用HAL库默认的弱定义回调函数
-  void (* Base_MspInitCallback)(struct __TIM_HandleTypeDef *htim);              /*!< TIM Base Msp Init Callback                              */ // 基础定时器 MSP 初始化回调
-  void (* Base_MspDeInitCallback)(struct __TIM_HandleTypeDef *htim);            /*!< TIM Base Msp DeInit Callback                            */ // 基础定时器 MSP 反初始化回调
-  void (* IC_MspInitCallback)(struct __TIM_HandleTypeDef *htim);                /*!< TIM IC Msp Init Callback                                */ // 输入捕获 MSP 初始化回调
-  void (* IC_MspDeInitCallback)(struct __TIM_HandleTypeDef *htim);              /*!< TIM IC Msp DeInit Callback                              */ // 输入捕获 MSP 反初始化回调
-  void (* OC_MspInitCallback)(struct __TIM_HandleTypeDef *htim);                /*!< TIM OC Msp Init Callback                                */ // 输出比较 MSP 初始化回调
-  void (* OC_MspDeInitCallback)(struct __TIM_HandleTypeDef *htim);              /*!< TIM OC Msp DeInit Callback                              */ // 输出比较 MSP 反初始化回调
-  void (* PWM_MspInitCallback)(struct __TIM_HandleTypeDef *htim);               /*!< TIM PWM Msp Init Callback                               */ // PWM MSP 初始化回调
-  void (* PWM_MspDeInitCallback)(struct __TIM_HandleTypeDef *htim);             /*!< TIM PWM Msp DeInit Callback                             */ // PWM MSP 反初始化回调
-  void (* OnePulse_MspInitCallback)(struct __TIM_HandleTypeDef *htim);          /*!< TIM One Pulse Msp Init Callback                         */ // 单脉冲 MSP 初始化回调
-  void (* OnePulse_MspDeInitCallback)(struct __TIM_HandleTypeDef *htim);        /*!< TIM One Pulse Msp DeInit Callback                       */ // 单脉冲 MSP 反初始化回调
-  void (* Encoder_MspInitCallback)(struct __TIM_HandleTypeDef *htim);           /*!< TIM Encoder Msp Init Callback                           */ // 编码器 MSP 初始化回调
-  void (* Encoder_MspDeInitCallback)(struct __TIM_HandleTypeDef *htim);         /*!< TIM Encoder Msp DeInit Callback                         */ // 编码器 MSP 反初始化回调
-  void (* HallSensor_MspInitCallback)(struct __TIM_HandleTypeDef *htim);        /*!< TIM Hall Sensor Msp Init Callback                       */ // 霍尔传感器 MSP 初始化回调
-  void (* HallSensor_MspDeInitCallback)(struct __TIM_HandleTypeDef *htim);      /*!< TIM Hall Sensor Msp DeInit Callback                     */ // 霍尔传感器 MSP 反初始化回调
-  void (* PeriodElapsedCallback)(struct __TIM_HandleTypeDef *htim);             /*!< TIM Period Elapsed Callback                             */ // 周期溢出回调（更新事件）
-  void (* PeriodElapsedHalfCpltCallback)(struct __TIM_HandleTypeDef *htim);     /*!< TIM Period Elapsed half complete Callback               */ // 周期溢出半完成回调（用于DMA模式）
-  void (* TriggerCallback)(struct __TIM_HandleTypeDef *htim);                   /*!< TIM Trigger Callback                                    */ // 触发回调
-  void (* TriggerHalfCpltCallback)(struct __TIM_HandleTypeDef *htim);           /*!< TIM Trigger half complete Callback                      */ // 触发半完成回调（用于DMA模式）
-  void (* IC_CaptureCallback)(struct __TIM_HandleTypeDef *htim);                /*!< TIM Input Capture Callback                              */ // 输入捕获回调
-  void (* IC_CaptureHalfCpltCallback)(struct __TIM_HandleTypeDef *htim);        /*!< TIM Input Capture half complete Callback                */ // 输入捕获半完成回调（用于DMA模式）
-  void (* OC_DelayElapsedCallback)(struct __TIM_HandleTypeDef *htim);           /*!< TIM Output Compare Delay Elapsed Callback               */ // 输出比较延时结束回调
-  void (* PWM_PulseFinishedCallback)(struct __TIM_HandleTypeDef *htim);         /*!< TIM PWM Pulse Finished Callback                         */ // PWM 脉冲结束回调
-  void (* PWM_PulseFinishedHalfCpltCallback)(struct __TIM_HandleTypeDef *htim); /*!< TIM PWM Pulse Finished half complete Callback           */ // PWM 脉冲结束半完成回调（用于DMA模式）
-  void (* ErrorCallback)(struct __TIM_HandleTypeDef *htim);                     /*!< TIM Error Callback                                      */ // 错误回调
-  void (* CommutationCallback)(struct __TIM_HandleTypeDef *htim);               /*!< TIM Commutation Callback                                */ // 换向回调（用于电机控制）
-  void (* CommutationHalfCpltCallback)(struct __TIM_HandleTypeDef *htim);       /*!< TIM Commutation half complete Callback                  */ // 换向半完成回调（用于DMA模式）
-  void (* BreakCallback)(struct __TIM_HandleTypeDef *htim);                     /*!< TIM Break Callback                                      */ // 刹车回调（用于电机控制安全保护）
+  /* 定时器基础模式 MSP 初始化回调函数指针 */
+  void (* Base_MspInitCallback)(struct __TIM_HandleTypeDef *htim);
+  /* 定时器基础模式 MSP 反初始化回调函数指针 */
+  void (* Base_MspDeInitCallback)(struct __TIM_HandleTypeDef *htim);
+  /* 定时器输入捕获模式 MSP 初始化回调函数指针 */
+  void (* IC_MspInitCallback)(struct __TIM_HandleTypeDef *htim);
+  /* 定时器输入捕获模式 MSP 反初始化回调函数指针 */
+  void (* IC_MspDeInitCallback)(struct __TIM_HandleTypeDef *htim);
+  /* 定时器输出比较模式 MSP 初始化回调函数指针 */
+  void (* OC_MspInitCallback)(struct __TIM_HandleTypeDef *htim);
+  /* 定时器输出比较模式 MSP 反初始化回调函数指针 */
+  void (* OC_MspDeInitCallback)(struct __TIM_HandleTypeDef *htim);
+  /* 定时器 PWM 模式 MSP 初始化回调函数指针 */
+  void (* PWM_MspInitCallback)(struct __TIM_HandleTypeDef *htim);
+  /* 定时器 PWM 模式 MSP 反初始化回调函数指针 */
+  void (* PWM_MspDeInitCallback)(struct __TIM_HandleTypeDef *htim);
+  /* 定时器单脉冲模式 MSP 初始化回调函数指针 */
+  void (* OnePulse_MspInitCallback)(struct __TIM_HandleTypeDef *htim);
+  /* 定时器单脉冲模式 MSP 反初始化回调函数指针 */
+  void (* OnePulse_MspDeInitCallback)(struct __TIM_HandleTypeDef *htim);
+  /* 定时器编码器模式 MSP 初始化回调函数指针 */
+  void (* Encoder_MspInitCallback)(struct __TIM_HandleTypeDef *htim);
+  /* 定时器编码器模式 MSP 反初始化回调函数指针 */
+  void (* Encoder_MspDeInitCallback)(struct __TIM_HandleTypeDef *htim);
+  /* 定时器霍尔传感器模式 MSP 初始化回调函数指针 */
+  void (* HallSensor_MspInitCallback)(struct __TIM_HandleTypeDef *htim);
+  /* 定时器霍尔传感器模式 MSP 反初始化回调函数指针 */
+  void (* HallSensor_MspDeInitCallback)(struct __TIM_HandleTypeDef *htim);
+  /* 定时器周期溢出回调函数指针 */
+  void (* PeriodElapsedCallback)(struct __TIM_HandleTypeDef *htim);
+  /* 定时器周期溢出半完成回调函数指针 (用于 DMA 双缓冲) */
+  void (* PeriodElapsedHalfCpltCallback)(struct __TIM_HandleTypeDef *htim);
+  /* 定时器触发回调函数指针 */
+  void (* TriggerCallback)(struct __TIM_HandleTypeDef *htim);
+  /* 定时器触发半完成回调函数指针 (用于 DMA 双缓冲) */
+  void (* TriggerHalfCpltCallback)(struct __TIM_HandleTypeDef *htim);
+  /* 定时器输入捕获回调函数指针 */
+  void (* IC_CaptureCallback)(struct __TIM_HandleTypeDef *htim);
+  /* 定时器输入捕获半完成回调函数指针 (用于 DMA 双缓冲) */
+  void (* IC_CaptureHalfCpltCallback)(struct __TIM_HandleTypeDef *htim);
+  /* 定时器输出比较延迟结束回调函数指针 */
+  void (* OC_DelayElapsedCallback)(struct __TIM_HandleTypeDef *htim);
+  /* 定时器 PWM 脉冲结束回调函数指针 */
+  void (* PWM_PulseFinishedCallback)(struct __TIM_HandleTypeDef *htim);
+  /* 定时器 PWM 脉冲结束半完成回调函数指针 (用于 DMA 双缓冲) */
+  void (* PWM_PulseFinishedHalfCpltCallback)(struct __TIM_HandleTypeDef *htim);
+  /* 定时器错误回调函数指针 */
+  void (* ErrorCallback)(struct __TIM_HandleTypeDef *htim);
+  /* 定时器换相回调函数指针 */
+  void (* CommutationCallback)(struct __TIM_HandleTypeDef *htim);
+  /* 定时器换相半完成回调函数指针 (用于 DMA 双缓冲) */
+  void (* CommutationHalfCpltCallback)(struct __TIM_HandleTypeDef *htim);
+  /* 定时器刹车信号回调函数指针 */
+  void (* BreakCallback)(struct __TIM_HandleTypeDef *htim);
 #endif /* USE_HAL_TIM_REGISTER_CALLBACKS */
 } TIM_HandleTypeDef;
 
 #if (USE_HAL_TIM_REGISTER_CALLBACKS == 1)
 /**
-  * @brief  HAL TIM Callback ID enumeration definition
-  *         HAL TIM 回调 ID 枚举定义，用于注册或注销特定的回调函数
+  * @brief  HAL TIM 回调 ID 枚举定义
+  * @note   用于 HAL_TIM_RegisterCallback 函数注册回调函数时指定回调类型
   */
 typedef enum
 {
-  HAL_TIM_BASE_MSPINIT_CB_ID              = 0x00U   /*!< TIM Base MspInit Callback ID                               */ // 基础定时器 MSP 初始化回调 ID
-  , HAL_TIM_BASE_MSPDEINIT_CB_ID          = 0x01U   /*!< TIM Base MspDeInit Callback ID                             */ // 基础定时器 MSP 反初始化回调 ID
-  , HAL_TIM_IC_MSPINIT_CB_ID              = 0x02U   /*!< TIM IC MspInit Callback ID                                 */ // 输入捕获 MSP 初始化回调 ID
-  , HAL_TIM_IC_MSPDEINIT_CB_ID            = 0x03U   /*!< TIM IC MspDeInit Callback ID                               */ // 输入捕获 MSP 反初始化回调 ID
-  , HAL_TIM_OC_MSPINIT_CB_ID              = 0x04U   /*!< TIM OC MspInit Callback ID                                 */ // 输出比较 MSP 初始化回调 ID
-  , HAL_TIM_OC_MSPDEINIT_CB_ID            = 0x05U   /*!< TIM OC MspDeInit Callback ID                               */ // 输出比较 MSP 反初始化回调 ID
-  , HAL_TIM_PWM_MSPINIT_CB_ID             = 0x06U   /*!< TIM PWM MspInit Callback ID                                */ // PWM MSP 初始化回调 ID
-  , HAL_TIM_PWM_MSPDEINIT_CB_ID           = 0x07U   /*!< TIM PWM MspDeInit Callback ID                              */ // PWM MSP 反初始化回调 ID
-  , HAL_TIM_ONE_PULSE_MSPINIT_CB_ID       = 0x08U   /*!< TIM One Pulse MspInit Callback ID                          */ // 单脉冲 MSP 初始化回调 ID
-  , HAL_TIM_ONE_PULSE_MSPDEINIT_CB_ID     = 0x09U   /*!< TIM One Pulse MspDeInit Callback ID                        */ // 单脉冲 MSP 反初始化回调 ID
-  , HAL_TIM_ENCODER_MSPINIT_CB_ID         = 0x0AU   /*!< TIM Encoder MspInit Callback ID                            */ // 编码器 MSP 初始化回调 ID
-  , HAL_TIM_ENCODER_MSPDEINIT_CB_ID       = 0x0BU   /*!< TIM Encoder MspDeInit Callback ID                          */ // 编码器 MSP 反初始化回调 ID
-  , HAL_TIM_HALL_SENSOR_MSPINIT_CB_ID     = 0x0CU   /*!< TIM Hall Sensor MspDeInit Callback ID                      */ // 霍尔传感器 MSP 初始化回调 ID
-  , HAL_TIM_HALL_SENSOR_MSPDEINIT_CB_ID   = 0x0DU   /*!< TIM Hall Sensor MspDeInit Callback ID                      */ // 霍尔传感器 MSP 反初始化回调 ID
-  , HAL_TIM_PERIOD_ELAPSED_CB_ID          = 0x0EU   /*!< TIM Period Elapsed Callback ID                             */ // 周期溢出回调 ID
-  , HAL_TIM_PERIOD_ELAPSED_HALF_CB_ID     = 0x0FU   /*!< TIM Period Elapsed half complete Callback ID               */ // 周期溢出半完成回调 ID
-  , HAL_TIM_TRIGGER_CB_ID                 = 0x10U   /*!< TIM Trigger Callback ID                                    */ // 触发回调 ID
-  , HAL_TIM_TRIGGER_HALF_CB_ID            = 0x11U   /*!< TIM Trigger half complete Callback ID                      */ // 触发半完成回调 ID
-  , HAL_TIM_IC_CAPTURE_CB_ID              = 0x12U   /*!< TIM Input Capture Callback ID                              */ // 输入捕获回调 ID
-  , HAL_TIM_IC_CAPTURE_HALF_CB_ID         = 0x13U   /*!< TIM Input Capture half complete Callback ID                */ // 输入捕获半完成回调 ID
-  , HAL_TIM_OC_DELAY_ELAPSED_CB_ID        = 0x14U   /*!< TIM Output Compare Delay Elapsed Callback ID               */ // 输出比较延时结束回调 ID
-  , HAL_TIM_PWM_PULSE_FINISHED_CB_ID      = 0x15U   /*!< TIM PWM Pulse Finished Callback ID                         */ // PWM 脉冲结束回调 ID
-  , HAL_TIM_PWM_PULSE_FINISHED_HALF_CB_ID = 0x16U   /*!< TIM PWM Pulse Finished half complete Callback ID           */ // PWM 脉冲结束半完成回调 ID
-  , HAL_TIM_ERROR_CB_ID                   = 0x17U   /*!< TIM Error Callback ID                                      */ // 错误回调 ID
-  , HAL_TIM_COMMUTATION_CB_ID             = 0x18U   /*!< TIM Commutation Callback ID                                */ // 换向回调 ID
-  , HAL_TIM_COMMUTATION_HALF_CB_ID        = 0x19U   /*!< TIM Commutation half complete Callback ID                  */ // 换向半完成回调 ID
-  , HAL_TIM_BREAK_CB_ID                   = 0x1AU   /*!< TIM Break Callback ID                                      */ // 刹车回调 ID
+  HAL_TIM_BASE_MSPINIT_CB_ID              = 0x00U   /* 基础模式 MSP 初始化回调 ID */
+  , HAL_TIM_BASE_MSPDEINIT_CB_ID          = 0x01U   /* 基础模式 MSP 反初始化回调 ID */
+  , HAL_TIM_IC_MSPINIT_CB_ID              = 0x02U   /* 输入捕获模式 MSP 初始化回调 ID */
+  , HAL_TIM_IC_MSPDEINIT_CB_ID            = 0x03U   /* 输入捕获模式 MSP 反初始化回调 ID */
+  , HAL_TIM_OC_MSPINIT_CB_ID              = 0x04U   /* 输出比较模式 MSP 初始化回调 ID */
+  , HAL_TIM_OC_MSPDEINIT_CB_ID            = 0x05U   /* 输出比较模式 MSP 反初始化回调 ID */
+  , HAL_TIM_PWM_MSPINIT_CB_ID             = 0x06U   /* PWM 模式 MSP 初始化回调 ID */
+  , HAL_TIM_PWM_MSPDEINIT_CB_ID           = 0x07U   /* PWM 模式 MSP 反初始化回调 ID */
+  , HAL_TIM_ONE_PULSE_MSPINIT_CB_ID       = 0x08U   /* 单脉冲模式 MSP 初始化回调 ID */
+  , HAL_TIM_ONE_PULSE_MSPDEINIT_CB_ID     = 0x09U   /* 单脉冲模式 MSP 反初始化回调 ID */
+  , HAL_TIM_ENCODER_MSPINIT_CB_ID         = 0x0AU   /* 编码器模式 MSP 初始化回调 ID */
+  , HAL_TIM_ENCODER_MSPDEINIT_CB_ID       = 0x0BU   /* 编码器模式 MSP 反初始化回调 ID */
+  , HAL_TIM_HALL_SENSOR_MSPINIT_CB_ID     = 0x0CU   /* 霍尔传感器模式 MSP 初始化回调 ID */
+  , HAL_TIM_HALL_SENSOR_MSPDEINIT_CB_ID   = 0x0DU   /* 霍尔传感器模式 MSP 反初始化回调 ID */
+  , HAL_TIM_PERIOD_ELAPSED_CB_ID          = 0x0EU   /* 周期溢出回调 ID */
+  , HAL_TIM_PERIOD_ELAPSED_HALF_CB_ID     = 0x0FU   /* 周期溢出半完成回调 ID */
+  , HAL_TIM_TRIGGER_CB_ID                 = 0x10U   /* 触发回调 ID */
+  , HAL_TIM_TRIGGER_HALF_CB_ID            = 0x11U   /* 触发半完成回调 ID */
+  , HAL_TIM_IC_CAPTURE_CB_ID              = 0x12U   /* 输入捕获回调 ID */
+  , HAL_TIM_IC_CAPTURE_HALF_CB_ID         = 0x13U   /* 输入捕获半完成回调 ID */
+  , HAL_TIM_OC_DELAY_ELAPSED_CB_ID        = 0x14U   /* 输出比较延迟结束回调 ID */
+  , HAL_TIM_PWM_PULSE_FINISHED_CB_ID      = 0x15U   /* PWM 脉冲结束回调 ID */
+  , HAL_TIM_PWM_PULSE_FINISHED_HALF_CB_ID = 0x16U   /* PWM 脉冲结束半完成回调 ID */
+  , HAL_TIM_ERROR_CB_ID                   = 0x17U   /* 错误回调 ID */
+  , HAL_TIM_COMMUTATION_CB_ID             = 0x18U   /* 换相回调 ID */
+  , HAL_TIM_COMMUTATION_HALF_CB_ID        = 0x19U   /* 换相半完成回调 ID */
+  , HAL_TIM_BREAK_CB_ID                   = 0x1AU   /* 刹车回调 ID */
 } HAL_TIM_CallbackIDTypeDef;
 
 /**
-  * @brief  HAL TIM Callback pointer definition
-  *         HAL TIM 回调函数指针类型定义
+  * @brief  HAL TIM 回调函数指针定义
   */
-typedef  void (*pTIM_CallbackTypeDef)(TIM_HandleTypeDef *htim);  /*!< pointer to the TIM callback function */ // 指向 TIM 回调函数的指针
+typedef  void (*pTIM_CallbackTypeDef)(TIM_HandleTypeDef *htim);  /* 指向 TIM 回调函数的指针 */
 
 #endif /* USE_HAL_TIM_REGISTER_CALLBACKS */
 
 /**
   * @}
   */
-/* End of exported types -----------------------------------------------------*/
-/* 导出类型结束 ----------------------------------------------------------------*/
+/* 导出类型定义结束 -----------------------------------------------------*/
 
-/* Exported constants --------------------------------------------------------*/
-/* 导出常量 --------------------------------------------------------------------*/
-/** @defgroup TIM_Exported_Constants TIM Exported Constants
+/* 导出常量定义 --------------------------------------------------------*/
+/** @defgroup TIM_Exported_Constants TIM 导出常量
   * @{
   */
 
-/** @defgroup TIM_ClearInput_Source TIM Clear Input Source
+/** @defgroup TIM_ClearInput_Source TIM 清除输入源
   * @{
   */
-// 清除输入源配置，用于 OPM 模式或从模式控制
-#define TIM_CLEARINPUTSOURCE_NONE           0x00000000U   /*!< OCREF_CLR is disabled */ // 禁用清除输入，OCREF_CLR 不受影响
-#define TIM_CLEARINPUTSOURCE_ETR            0x00000001U   /*!< OCREF_CLR is connected to ETRF input */ // OCREF_CLR 连接到 ETRF 输入
+/* 清除输入源禁用 (OCREF_CLR 功能关闭) */
+#define TIM_CLEARINPUTSOURCE_NONE           0x00000000U
+/* 清除输入源连接到 ETRF 引脚 (ETR 清除输入使能) */
+#define TIM_CLEARINPUTSOURCE_ETR            0x00000001U
 /**
   * @}
   */
 
-/** @defgroup TIM_DMA_Base_address TIM DMA Base Address
+/** @defgroup TIM_DMA_Base_address TIM DMA 基地址
   * @{
   */
-// DMA 基地址定义，用于配置 DMA 传输时的寄存器起始地址
-#define TIM_DMABASE_CR1                    0x00000000U  // 控制寄存器 1 (Control Register 1)
-#define TIM_DMABASE_CR2                    0x00000001U  // 控制寄存器 2 (Control Register 2)
-#define TIM_DMABASE_SMCR                   0x00000002U  // 从模式控制寄存器 (Slave Mode Control Register)
-#define TIM_DMABASE_DIER                   0x00000003U  // DMA/中断使能寄存器
-#define TIM_DMABASE_SR                     0x00000004U  // 状态寄存器
-#define TIM_DMABASE_EGR                    0x00000005U  // 事件产生寄存器
-#define TIM_DMABASE_CCMR1                  0x00000006U  // 捕获/比较模式寄存器 1
-#define TIM_DMABASE_CCMR2                  0x00000007U  // 捕获/比较模式寄存器 2
-#define TIM_DMABASE_CCER                   0x00000008U  // 捕获/比较使能寄存器
-#define TIM_DMABASE_CNT                    0x00000009U  // 计数器寄存器
-#define TIM_DMABASE_PSC                    0x0000000AU  // 预分频器寄存器
-#define TIM_DMABASE_ARR                    0x0000000BU  // 自动重装载寄存器
-#define TIM_DMABASE_RCR                    0x0000000CU  // 重复计数器寄存器
-#define TIM_DMABASE_CCR1                   0x0000000DU  // 捕获/比较寄存器 1
-#define TIM_DMABASE_CCR2                   0x0000000EU  // 捕获/比较寄存器 2
-#define TIM_DMABASE_CCR3                   0x0000000FU  // 捕获/比较寄存器 3
-#define TIM_DMABASE_CCR4                   0x00000010U  // 捕获/比较寄存器 4
-#define TIM_DMABASE_BDTR                   0x00000011U  // 刹车和死区寄存器
-#define TIM_DMABASE_DCR                    0x00000012U  // DMA 控制寄存器
-#define TIM_DMABASE_DMAR                   0x00000013U  // DMA 地址用于全传输寄存器
+/* DMA 访问基地址指向控制寄存器 1 (CR1) */
+#define TIM_DMABASE_CR1                    0x00000000U
+/* DMA 访问基地址指向控制寄存器 2 (CR2) */
+#define TIM_DMABASE_CR2                    0x00000001U
+/* DMA 访问基地址指向从模式控制寄存器 (SMCR) */
+#define TIM_DMABASE_SMCR                   0x00000002U
+/* DMA 访问基地址指向 DMA/中断使能寄存器 (DIER) */
+#define TIM_DMABASE_DIER                   0x00000003U
+/* DMA 访问基地址指向状态寄存器 (SR) */
+#define TIM_DMABASE_SR                     0x00000004U
+/* DMA 访问基地址指向事件产生寄存器 (EGR) */
+#define TIM_DMABASE_EGR                    0x00000005U
+/* DMA 访问基地址指向捕获/比较模式寄存器 1 (CCMR1) */
+#define TIM_DMABASE_CCMR1                  0x00000006U
+/* DMA 访问基地址指向捕获/比较模式寄存器 2 (CCMR2) */
+#define TIM_DMABASE_CCMR2                  0x00000007U
+/* DMA 访问基地址指向捕获/比较使能寄存器 (CCER) */
+#define TIM_DMABASE_CCER                   0x00000008U
+/* DMA 访问基地址指向计数器寄存器 (CNT) */
+#define TIM_DMABASE_CNT                    0x00000009U
+/* DMA 访问基地址指向预分频器寄存器 (PSC) */
+#define TIM_DMABASE_PSC                    0x0000000AU
+/* DMA 访问基地址指向自动重装载寄存器 (ARR) */
+#define TIM_DMABASE_ARR                    0x0000000BU
+/* DMA 访问基地址指向重复计数器寄存器 (RCR) */
+#define TIM_DMABASE_RCR                    0x0000000CU
+/* DMA 访问基地址指向捕获/比较寄存器 1 (CCR1) */
+#define TIM_DMABASE_CCR1                   0x0000000DU
+/* DMA 访问基地址指向捕获/比较寄存器 2 (CCR2) */
+#define TIM_DMABASE_CCR2                   0x0000000EU
+/* DMA 访问基地址指向捕获/比较寄存器 3 (CCR3) */
+#define TIM_DMABASE_CCR3                   0x0000000FU
+/* DMA 访问基地址指向捕获/比较寄存器 4 (CCR4) */
+#define TIM_DMABASE_CCR4                   0x00000010U
+/* DMA 访问基地址指向刹车和死区寄存器 (BDTR) */
+#define TIM_DMABASE_BDTR                   0x00000011U
+/* DMA 访问基地址指向 DMA 控制寄存器 (DCR) */
+#define TIM_DMABASE_DCR                    0x00000012U
+/* DMA 访问基地址指向 DMA 地址寄存器 (DMAR) */
+#define TIM_DMABASE_DMAR                   0x00000013U
 /**
   * @}
   */
 
-/** @defgroup TIM_Event_Source TIM Event Source
+/** @defgroup TIM_Event_Source TIM 事件源
   * @{
   */
-// 事件源定义，用于软件触发特定事件
-#define TIM_EVENTSOURCE_UPDATE              TIM_EGR_UG     /*!< Reinitialize the counter and generates an update of the registers */ // 产生更新事件，重新初始化计数器并更新寄存器
-#define TIM_EVENTSOURCE_CC1                 TIM_EGR_CC1G   /*!< A capture/compare event is generated on channel 1 */ // 在通道 1 产生捕获/比较事件
-#define TIM_EVENTSOURCE_CC2                 TIM_EGR_CC2G   /*!< A capture/compare event is generated on channel 2 */ // 在通道 2 产生捕获/比较事件
-#define TIM_EVENTSOURCE_CC3                 TIM_EGR_CC3G   /*!< A capture/compare event is generated on channel 3 */ // 在通道 3 产生捕获/比较事件
-#define TIM_EVENTSOURCE_CC4                 TIM_EGR_CC4G   /*!< A capture/compare event is generated on channel 4 */ // 在通道 4 产生捕获/比较事件
-#define TIM_EVENTSOURCE_COM                 TIM_EGR_COMG   /*!< A commutation event is generated */ // 产生换向事件
-#define TIM_EVENTSOURCE_TRIGGER             TIM_EGR_TG     /*!< A trigger event is generated */ // 产生触发事件
-#define TIM_EVENTSOURCE_BREAK               TIM_EGR_BG     /*!< A break event is generated */ // 产生刹车事件
+/* 更新事件：重新初始化计数器并产生寄存器更新 */
+#define TIM_EVENTSOURCE_UPDATE              TIM_EGR_UG
+/* 通道 1 捕获/比较事件：在通道 1 上产生捕获/比较事件 */
+#define TIM_EVENTSOURCE_CC1                 TIM_EGR_CC1G
+/* 通道 2 捕获/比较事件：在通道 2 上产生捕获/比较事件 */
+#define TIM_EVENTSOURCE_CC2                 TIM_EGR_CC2G
+/* 通道 3 捕获/比较事件：在通道 3 上产生捕获/比较事件 */
+#define TIM_EVENTSOURCE_CC3                 TIM_EGR_CC3G
+/* 通道 4 捕获/比较事件：在通道 4 上产生捕获/比较事件 */
+#define TIM_EVENTSOURCE_CC4                 TIM_EGR_CC4G
+/* 换相事件：产生换相事件 */
+#define TIM_EVENTSOURCE_COM                 TIM_EGR_COMG
+/* 触发事件：产生触发事件 */
+#define TIM_EVENTSOURCE_TRIGGER             TIM_EGR_TG
+/* 刹车事件：产生刹车事件 */
+#define TIM_EVENTSOURCE_BREAK               TIM_EGR_BG
 /**
   * @}
   */
 
-/** @defgroup TIM_Input_Channel_Polarity TIM Input Channel polarity
+/** @defgroup TIM_Input_Channel_Polarity TIM 输入通道极性
   * @{
   */
-// 输入通道极性定义，用于输入捕获模式
-#define  TIM_INPUTCHANNELPOLARITY_RISING      0x00000000U                       /*!< Polarity for TIx source */ // 上升沿捕获
-#define  TIM_INPUTCHANNELPOLARITY_FALLING     TIM_CCER_CC1P                     /*!< Polarity for TIx source */ // 下降沿捕获
-#define  TIM_INPUTCHANNELPOLARITY_BOTHEDGE    (TIM_CCER_CC1P | TIM_CCER_CC1NP)  /*!< Polarity for TIx source */ // 双沿捕获（上升沿和下降沿都捕获）
+/* 输入捕获上升沿极性 */
+#define  TIM_INPUTCHANNELPOLARITY_RISING      0x00000000U
+/* 输入捕获下降沿极性 */
+#define  TIM_INPUTCHANNELPOLARITY_FALLING     TIM_CCER_CC1P
+/* 输入捕获双边沿极性 (上升沿和下降沿均触发) */
+#define  TIM_INPUTCHANNELPOLARITY_BOTHEDGE    (TIM_CCER_CC1P | TIM_CCER_CC1NP)
 /**
   * @}
   */
 
-/** @defgroup TIM_ETR_Polarity TIM ETR Polarity
+/** @defgroup TIM_ETR_Polarity TIM ETR 极性
   * @{
   */
-// 外部触发 (ETR) 极性定义
-#define TIM_ETRPOLARITY_INVERTED              TIM_SMCR_ETP                      /*!< Polarity for ETR source */ // ETR 反相：低电平或下降沿有效
-#define TIM_ETRPOLARITY_NONINVERTED           0x00000000U                       /*!< Polarity for ETR source */ // ETR 不反相：高电平或上升沿有效
+/* ETR 信号反相：低电平或下降沿有效 */
+#define TIM_ETRPOLARITY_INVERTED              TIM_SMCR_ETP
+/* ETR 信号不反相：高电平或上升沿有效 */
+#define TIM_ETRPOLARITY_NONINVERTED           0x00000000U
 /**
   * @}
   */
 
-/** @defgroup TIM_ETR_Prescaler TIM ETR Prescaler
+/** @defgroup TIM_ETR_Prescaler TIM ETR 预分频
   * @{
   */
-// 外部触发 (ETR) 预分频定义，用于降低外部时钟频率
-#define TIM_ETRPRESCALER_DIV1                 0x00000000U                       /*!< No prescaler is used */ // 不分频
-#define TIM_ETRPRESCALER_DIV2                 TIM_SMCR_ETPS_0                   /*!< ETR input source is divided by 2 */ // 2 分频
-#define TIM_ETRPRESCALER_DIV4                 TIM_SMCR_ETPS_1                   /*!< ETR input source is divided by 4 */ // 4 分频
-#define TIM_ETRPRESCALER_DIV8                 TIM_SMCR_ETPS                     /*!< ETR input source is divided by 8 */ // 8 分频
+/* ETR 预分频：不分频 */
+#define TIM_ETRPRESCALER_DIV1                 0x00000000U
+/* ETR 预分频：2 分频 */
+#define TIM_ETRPRESCALER_DIV2                 TIM_SMCR_ETPS_0
+/* ETR 预分频：4 分频 */
+#define TIM_ETRPRESCALER_DIV4                 TIM_SMCR_ETPS_1
+/* ETR 预分频：8 分频 */
+#define TIM_ETRPRESCALER_DIV8                 TIM_SMCR_ETPS
 /**
   * @}
   */
 
-/** @defgroup TIM_Counter_Mode TIM Counter Mode
+/** @defgroup TIM_Counter_Mode TIM 计数模式
   * @{
   */
-// 计数器模式定义
-#define TIM_COUNTERMODE_UP                 0x00000000U                          /*!< Counter used as up-counter   */ // 向上计数模式
-#define TIM_COUNTERMODE_DOWN               TIM_CR1_DIR                          /*!< Counter used as down-counter */ // 向下计数模式
-#define TIM_COUNTERMODE_CENTERALIGNED1     TIM_CR1_CMS_0                        /*!< Center-aligned mode 1        */ // 中心对齐模式 1：仅在向下计数时产生比较中断
-#define TIM_COUNTERMODE_CENTERALIGNED2     TIM_CR1_CMS_1                        /*!< Center-aligned mode 2        */ // 中心对齐模式 2：仅在向上计数时产生比较中断
-#define TIM_COUNTERMODE_CENTERALIGNED3     TIM_CR1_CMS                          /*!< Center-aligned mode 3        */ // 中心对齐模式 3：在向上和向下计数时都产生比较中断
+/* 向上计数模式：计数器从 0 计数到自动重装载值 */
+#define TIM_COUNTERMODE_UP                 0x00000000U
+/* 向下计数模式：计数器从自动重装载值计数到 0 */
+#define TIM_COUNTERMODE_DOWN               TIM_CR1_DIR
+/* 中心对齐模式 1：仅在计数器向下计数时产生比较中断 */
+#define TIM_COUNTERMODE_CENTERALIGNED1     TIM_CR1_CMS_0
+/* 中心对齐模式 2：仅在计数器向上计数时产生比较中断 */
+#define TIM_COUNTERMODE_CENTERALIGNED2     TIM_CR1_CMS_1
+/* 中心对齐模式 3：在计数器向上和向下计数时均产生比较中断 */
+#define TIM_COUNTERMODE_CENTERALIGNED3     TIM_CR1_CMS
 /**
   * @}
   */
 
-/** @defgroup TIM_ClockDivision TIM Clock Division
+/** @defgroup TIM_ClockDivision TIM 时钟分频
   * @{
   */
-// 时钟分频定义，用于配置死区时间和数字滤波器 (DTG, ETR, TIx) 的采样时钟
-#define TIM_CLOCKDIVISION_DIV1             0x00000000U                          /*!< Clock division: tDTS=tCK_INT   */ // tDTS = tCK_INT (不分频)
-#define TIM_CLOCKDIVISION_DIV2             TIM_CR1_CKD_0                        /*!< Clock division: tDTS=2*tCK_INT */ // tDTS = 2 * tCK_INT
-#define TIM_CLOCKDIVISION_DIV4             TIM_CR1_CKD_1                        /*!< Clock division: tDTS=4*tCK_INT */ // tDTS = 4 * tCK_INT
+/* 时钟分频因子为 1：tDTS = tCK_INT (死区时间和数字滤波器采样频率等于内部时钟) */
+#define TIM_CLOCKDIVISION_DIV1             0x00000000U
+/* 时钟分频因子为 2：tDTS = 2 * tCK_INT */
+#define TIM_CLOCKDIVISION_DIV2             TIM_CR1_CKD_0
+/* 时钟分频因子为 4：tDTS = 4 * tCK_INT */
+#define TIM_CLOCKDIVISION_DIV4             TIM_CR1_CKD_1
 /**
   * @}
   */
 
-/** @defgroup TIM_Output_Compare_State TIM Output Compare State
+/** @defgroup TIM_Output_Compare_State TIM 输出比较状态
   * @{
   */
-// 输出比较状态定义，用于使能或禁用输出
-#define TIM_OUTPUTSTATE_DISABLE            0x00000000U                          /*!< Capture/Compare 1 output disabled */ // 禁用捕获/比较输出
-#define TIM_OUTPUTSTATE_ENABLE             TIM_CCER_CC1E                        /*!< Capture/Compare 1 output enabled */ // 使能捕获/比较输出
+/* 输出比较禁用：捕获/比较输出关闭 */
+#define TIM_OUTPUTSTATE_DISABLE            0x00000000U
+/* 输出比较使能：捕获/比较输出开启 */
+#define TIM_OUTPUTSTATE_ENABLE             TIM_CCER_CC1E
 /**
   * @}
   */
 
-/** @defgroup TIM_AutoReloadPreload TIM Auto-Reload Preload
+/** @defgroup TIM_AutoReloadPreload TIM 自动重装载预装载
   * @{
   */
-// 自动重装载预装载定义，控制 ARR 寄存器的缓冲
-#define TIM_AUTORELOAD_PRELOAD_DISABLE                0x00000000U               /*!< TIMx_ARR register is not buffered */ // 禁用 ARR 预装载，写入 ARR 的值立即生效
-#define TIM_AUTORELOAD_PRELOAD_ENABLE                 TIM_CR1_ARPE              /*!< TIMx_ARR register is buffered */ // 使能 ARR 预装载，写入 ARR 的值在下一个更新事件才生效
+/* 自动重装载预装载禁用：TIMx_ARR 寄存器未缓冲，写入后立即生效 */
+#define TIM_AUTORELOAD_PRELOAD_DISABLE                0x00000000U
+/* 自动重装载预装载使能：TIMx_ARR 寄存器缓冲，写入后在下一个更新事件生效 */
+#define TIM_AUTORELOAD_PRELOAD_ENABLE                 TIM_CR1_ARPE
 
 /**
   * @}
   */
 
-/** @defgroup TIM_Output_Fast_State TIM Output Fast State
+/** @defgroup TIM_Output_Fast_State TIM 输出快速状态
   * @{
   */
-// 输出快速模式定义，用于在 PWM 模式下快速响应触发输入
-#define TIM_OCFAST_DISABLE                 0x00000000U                          /*!< Output Compare fast disable */ // 禁用快速输出
-#define TIM_OCFAST_ENABLE                  TIM_CCMR1_OC1FE                      /*!< Output Compare fast enable  */ // 使能快速输出
+/* 输出比较快速模式禁用 */
+#define TIM_OCFAST_DISABLE                 0x00000000U
+/* 输出比较快速模式使能：触发输入有效时，快速使能输出比较 */
+#define TIM_OCFAST_ENABLE                  TIM_CCMR1_OC1FE
 /**
   * @}
   */
 
-/** @defgroup TIM_Output_Compare_N_State TIM Complementary Output Compare State
+/** @defgroup TIM_Output_Compare_N_State TIM 互补输出比较状态
   * @{
   */
-// 互补输出比较状态定义，用于使能或禁用互补通道 (N 通道)
-#define TIM_OUTPUTNSTATE_DISABLE           0x00000000U                          /*!< OCxN is disabled  */ // 禁用互补输出
-#define TIM_OUTPUTNSTATE_ENABLE            TIM_CCER_CC1NE                       /*!< OCxN is enabled   */ // 使能互补输出
+/* 互补输出禁用：OCxN 输出关闭 */
+#define TIM_OUTPUTNSTATE_DISABLE           0x00000000U
+/* 互补输出使能：OCxN 输出开启 */
+#define TIM_OUTPUTNSTATE_ENABLE            TIM_CCER_CC1NE
 /**
   * @}
   */
 
-/** @defgroup TIM_Output_Compare_Polarity TIM Output Compare Polarity
+/** @defgroup TIM_Output_Compare_Polarity TIM 输出比较极性
   * @{
   */
-// 输出比较极性定义
-#define TIM_OCPOLARITY_HIGH                0x00000000U                          /*!< Capture/Compare output polarity  */ // 有效电平为高电平
-#define TIM_OCPOLARITY_LOW                 TIM_CCER_CC1P                        /*!< Capture/Compare output polarity  */ // 有效电平为低电平
+/* 输出比较极性高电平有效 */
+#define TIM_OCPOLARITY_HIGH                0x00000000U
+/* 输出比较极性低电平有效 */
+#define TIM_OCPOLARITY_LOW                 TIM_CCER_CC1P
 /**
   * @}
   */
 
-/** @defgroup TIM_Output_Compare_N_Polarity TIM Complementary Output Compare Polarity
+/** @defgroup TIM_Output_Compare_N_Polarity TIM 互补输出比较极性
   * @{
   */
-// 互补输出比较极性定义
-#define TIM_OCNPOLARITY_HIGH               0x00000000U                          /*!< Capture/Compare complementary output polarity */ // 互补输出有效电平为高电平
-#define TIM_OCNPOLARITY_LOW                TIM_CCER_CC1NP                       /*!< Capture/Compare complementary output polarity */ // 互补输出有效电平为低电平
+/* 互补输出比较极性高电平有效 */
+#define TIM_OCNPOLARITY_HIGH               0x00000000U
+/* 互补输出比较极性低电平有效 */
+#define TIM_OCNPOLARITY_LOW                TIM_CCER_CC1NP
 /**
   * @}
   */
 
-/** @defgroup TIM_Output_Compare_Idle_State TIM Output Compare Idle State
+/** @defgroup TIM_Output_Compare_Idle_State TIM 输出比较空闲状态
   * @{
   */
-// 输出比较空闲状态定义，用于 MOE (Main Output Enable) 为 0 时的输出电平
-#define TIM_OCIDLESTATE_SET                TIM_CR2_OIS1                         /*!< Output Idle state: OCx=1 when MOE=0 */ // 空闲状态输出高电平
-#define TIM_OCIDLESTATE_RESET              0x00000000U                          /*!< Output Idle state: OCx=0 when MOE=0 */ // 空闲状态输出低电平
+/* 空闲状态输出高电平：当 MOE=0 (主输出禁用) 时，OCx=1 */
+#define TIM_OCIDLESTATE_SET                TIM_CR2_OIS1
+/* 空闲状态输出低电平：当 MOE=0 (主输出禁用) 时，OCx=0 */
+#define TIM_OCIDLESTATE_RESET              0x00000000U
 /**
   * @}
   */
 
-/** @defgroup TIM_Output_Compare_N_Idle_State TIM Complementary Output Compare Idle State
+/** @defgroup TIM_Output_Compare_N_Idle_State TIM 互补输出比较空闲状态
   * @{
   */
-// 互补输出比较空闲状态定义
-#define TIM_OCNIDLESTATE_SET               TIM_CR2_OIS1N                        /*!< Complementary output Idle state: OCxN=1 when MOE=0 */ // 互补输出空闲状态为高电平
-#define TIM_OCNIDLESTATE_RESET             0x00000000U                          /*!< Complementary output Idle state: OCxN=0 when MOE=0 */ // 互补输出空闲状态为低电平
+/* 互补输出空闲状态高电平：当 MOE=0 时，OCxN=1 */
+#define TIM_OCNIDLESTATE_SET               TIM_CR2_OIS1N
+/* 互补输出空闲状态低电平：当 MOE=0 时，OCxN=0 */
+#define TIM_OCNIDLESTATE_RESET             0x00000000U
 /**
   * @}
   */
 
-/** @defgroup TIM_Input_Capture_Polarity TIM Input Capture Polarity
+/** @defgroup TIM_Input_Capture_Polarity TIM 输入捕获极性
   * @{
   */
-// 输入捕获极性定义，与输入通道极性宏定义值相同，用于输入捕获配置
-#define  TIM_ICPOLARITY_RISING             TIM_INPUTCHANNELPOLARITY_RISING      /*!< Capture triggered by rising edge on timer input                  */ // 上升沿捕获
-#define  TIM_ICPOLARITY_FALLING            TIM_INPUTCHANNELPOLARITY_FALLING     /*!< Capture triggered by falling edge on timer input                 */ // 下降沿捕获
-#define  TIM_ICPOLARITY_BOTHEDGE           TIM_INPUTCHANNELPOLARITY_BOTHEDGE    /*!< Capture triggered by both rising and falling edges on timer input*/ // 双沿捕获
+/* 输入捕获上升沿触发 */
+#define  TIM_ICPOLARITY_RISING             TIM_INPUTCHANNELPOLARITY_RISING
+/* 输入捕获下降沿触发 */
+#define  TIM_ICPOLARITY_FALLING            TIM_INPUTCHANNELPOLARITY_FALLING
+/* 输入捕获双边沿触发 (上升沿和下降沿均捕获) */
+#define  TIM_ICPOLARITY_BOTHEDGE           TIM_INPUTCHANNELPOLARITY_BOTHEDGE
 /**
   * @}
   */
 
-/** @defgroup TIM_Encoder_Input_Polarity TIM Encoder Input Polarity
+/** @defgroup TIM_Encoder_Input_Polarity TIM 编码器输入极性
   * @{
   */
-// 编码器输入极性定义
-#define  TIM_ENCODERINPUTPOLARITY_RISING   TIM_INPUTCHANNELPOLARITY_RISING      /*!< Encoder input with rising edge polarity  */ // 编码器输入极性为上升沿
-#define  TIM_ENCODERINPUTPOLARITY_FALLING  TIM_INPUTCHANNELPOLARITY_FALLING     /*!< Encoder input with falling edge polarity */ // 编码器输入极性为下降沿
+/* 编码器输入极性上升沿有效 */
+#define  TIM_ENCODERINPUTPOLARITY_RISING   TIM_INPUTCHANNELPOLARITY_RISING
+/* 编码器输入极性下降沿有效 */
+#define  TIM_ENCODERINPUTPOLARITY_FALLING  TIM_INPUTCHANNELPOLARITY_FALLING
 /**
   * @}
   */
 
-/** @defgroup TIM_Input_Capture_Selection TIM Input Capture Selection
+/** @defgroup TIM_Input_Capture_Selection TIM 输入捕获选择
   * @{
   */
-// 输入捕获通道选择定义，配置输入信号与捕获寄存器的连接关系
-#define TIM_ICSELECTION_DIRECTTI           TIM_CCMR1_CC1S_0                     /*!< TIM Input 1, 2, 3 or 4 is selected to be connected to IC1, IC2, IC3 or IC4, respectively */ // 直接连接：TI1 连 IC1, TI2 连 IC2...
-#define TIM_ICSELECTION_INDIRECTTI         TIM_CCMR1_CC1S_1                     /*!< TIM Input 1, 2, 3 or 4 is selected to be connected to IC2, IC1, IC4 or IC3, respectively */ // 间接连接：TI1 连 IC2, TI2 连 IC1...
-#define TIM_ICSELECTION_TRC                TIM_CCMR1_CC1S                       /*!< TIM Input 1, 2, 3 or 4 is selected to be connected to TRC */ // 连接到 TRC (触发模式输出)
+/* 直接映射：TI1 映射到 IC1，TI2 映射到 IC2，以此类推 */
+#define TIM_ICSELECTION_DIRECTTI           TIM_CCMR1_CC1S_0
+/* 间接映射：TI1 映射到 IC2，TI2 映射到 IC1，以此类推 */
+#define TIM_ICSELECTION_INDIRECTTI         TIM_CCMR1_CC1S_1
+/* TRC 映射：输入捕获连接到 TRC 信号 (用于霍尔传感器模式等) */
+#define TIM_ICSELECTION_TRC                TIM_CCMR1_CC1S
 /**
   * @}
   */
 
-/** @defgroup TIM_Input_Capture_Prescaler TIM Input Capture Prescaler
+/** @defgroup TIM_Input_Capture_Prescaler TIM 输入捕获预分频
   * @{
   */
-// 输入捕获预分频定义，配置捕获事件发生的频率
-#define TIM_ICPSC_DIV1                     0x00000000U                          /*!< Capture performed each time an edge is detected on the capture input */ // 无预分频，每次检测到边沿都捕获
-#define TIM_ICPSC_DIV2                     TIM_CCMR1_IC1PSC_0                   /*!< Capture performed once every 2 events                                */ // 每 2 个事件捕获一次
-#define TIM_ICPSC_DIV4                     TIM_CCMR1_IC1PSC_1                   /*!< Capture performed once every 4 events                                */ // 每 4 个事件捕获一次
-#define TIM_ICPSC_DIV8                     TIM_CCMR1_IC1PSC                     /*!< Capture performed once every 8 events                                */ // 每 8 个事件捕获一次
+/* 无预分频：每检测到一个边沿执行一次捕获 */
+#define TIM_ICPSC_DIV1                     0x00000000U
+/* 2 分频：每检测到 2 个边沿执行一次捕获 */
+#define TIM_ICPSC_DIV2                     TIM_CCMR1_IC1PSC_0
+/* 4 分频：每检测到 4 个边沿执行一次捕获 */
+#define TIM_ICPSC_DIV4                     TIM_CCMR1_IC1PSC_1
+/* 8 分频：每检测到 8 个边沿执行一次捕获 */
+#define TIM_ICPSC_DIV8                     TIM_CCMR1_IC1PSC
 /**
   * @}
   */
 
-/** @defgroup TIM_One_Pulse_Mode TIM One Pulse Mode
+/** @defgroup TIM_One_Pulse_Mode TIM 单脉冲模式
   * @{
   */
-// 单脉冲模式定义
-#define TIM_OPMODE_SINGLE                  TIM_CR1_OPM                          /*!< Counter stops counting at the next update event */ // 单脉冲模式：在下一个更新事件停止计数
-#define TIM_OPMODE_REPETITIVE              0x00000000U                          /*!< Counter is not stopped at update event          */ // 重复模式：更新事件不停止计数
+/* 单脉冲模式：计数器在下一个更新事件停止计数 */
+#define TIM_OPMODE_SINGLE                  TIM_CR1_OPM
+/* 重复模式：计数器在更新事件时不停止计数 */
+#define TIM_OPMODE_REPETITIVE              0x00000000U
 /**
   * @}
   */
 
-/** @defgroup TIM_Encoder_Mode TIM Encoder Mode
+/** @defgroup TIM_Encoder_Mode TIM 编码器模式
   * @{
   */
-// 编码器接口模式定义
-#define TIM_ENCODERMODE_TI1                      TIM_SMCR_SMS_0                                                      /*!< Quadrature encoder mode 1, x2 mode, counts up/down on TI1FP1 edge depending on TI2FP2 level  */ // 编码器模式 1：在 TI1 边沿计数，TI2 决定方向
-#define TIM_ENCODERMODE_TI2                      TIM_SMCR_SMS_1                                                      /*!< Quadrature encoder mode 2, x2 mode, counts up/down on TI2FP2 edge depending on TI1FP1 level. */ // 编码器模式 2：在 TI2 边沿计数，TI1 决定方向
-#define TIM_ENCODERMODE_TI12                     (TIM_SMCR_SMS_1 | TIM_SMCR_SMS_0)                                   /*!< Quadrature encoder mode 3, x4 mode, counts up/down on both TI1FP1 and TI2FP2 edges depending on the level of the other input. */ // 编码器模式 3：在 TI1 和 TI2 边沿都计数 (4 倍频)
+/* 编码器模式 1：TI1 边沿计数 (x2 模式)，根据 TI2 电平决定计数方向 */
+#define TIM_ENCODERMODE_TI1                      TIM_SMCR_SMS_0
+/* 编码器模式 2：TI2 边沿计数 (x2 模式)，根据 TI1 电平决定计数方向 */
+#define TIM_ENCODERMODE_TI2                      TIM_SMCR_SMS_1
+/* 编码器模式 3：TI1 和 TI2 边沿均计数 (x4 模式)，根据另一通道电平决定计数方向 */
+#define TIM_ENCODERMODE_TI12                     (TIM_SMCR_SMS_1 | TIM_SMCR_SMS_0)
 /**
   * @}
   */
 
-/** @defgroup TIM_Interrupt_definition TIM interrupt Definition
+/** @defgroup TIM_Interrupt_definition TIM 中断定义
   * @{
   */
-// 中断定义，用于使能特定的定时器中断
-#define TIM_IT_UPDATE                      TIM_DIER_UIE                         /*!< Update interrupt            */ // 更新中断
-#define TIM_IT_CC1                         TIM_DIER_CC1IE                       /*!< Capture/Compare 1 interrupt */ // 捕获/比较 1 中断
-#define TIM_IT_CC2                         TIM_DIER_CC2IE                       /*!< Capture/Compare 2 interrupt */ // 捕获/比较 2 中断
-#define TIM_IT_CC3                         TIM_DIER_CC3IE                       /*!< Capture/Compare 3 interrupt */ // 捕获/比较 3 中断
-#define TIM_IT_CC4                         TIM_DIER_CC4IE                       /*!< Capture/Compare 4 interrupt */ // 捕获/比较 4 中断
-#define TIM_IT_COM                         TIM_DIER_COMIE                       /*!< Commutation interrupt       */ // 换向中断
-#define TIM_IT_TRIGGER                     TIM_DIER_TIE                         /*!< Trigger interrupt           */ // 触发中断
-#define TIM_IT_BREAK                       TIM_DIER_BIE                         /*!< Break interrupt             */ // 刹车中断
+/* 更新中断标志 */
+#define TIM_IT_UPDATE                      TIM_DIER_UIE
+/* 捕获/比较 1 中断标志 */
+#define TIM_IT_CC1                         TIM_DIER_CC1IE
+/* 捕获/比较 2 中断标志 */
+#define TIM_IT_CC2                         TIM_DIER_CC2IE
+/* 捕获/比较 3 中断标志 */
+#define TIM_IT_CC3                         TIM_DIER_CC3IE
+/* 捕获/比较 4 中断标志 */
+#define TIM_IT_CC4                         TIM_DIER_CC4IE
+/* 换相中断标志 */
+#define TIM_IT_COM                         TIM_DIER_COMIE
+/* 触发中断标志 */
+#define TIM_IT_TRIGGER                     TIM_DIER_TIE
+/* 刹车中断标志 */
+#define TIM_IT_BREAK                       TIM_DIER_BIE
 /**
   * @}
   */

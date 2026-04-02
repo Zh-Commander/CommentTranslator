@@ -1,8 +1,8 @@
-/** @defgroup TIM_DMA_Burst_Length TIM DMA Burst Length
+/** @defgroup TIM_DMA_Burst_Length TIM DMA 突发传输长度
   * @{
   */
-// 以下宏定义用于配置DMA突发传输的长度，即每次DMA请求传输的寄存器数量
-// 值对应TIMx_DCR寄存器的BL[4:0]位，左移了8位（0x100）
+/* DMA突发传输长度配置宏定义 */
+/* 这些宏定义用于配置TIMx_DCR寄存器中的DBL[4:0]位，决定DMA每次突发传输访问的寄存器数量 */
 #define TIM_DMABURSTLENGTH_1TRANSFER       0x00000000U                          /*!< 传输长度为1个寄存器，起始地址由 TIMx_CR1 + TIMx_DCR.DBA 决定   */
 #define TIM_DMABURSTLENGTH_2TRANSFERS      0x00000100U                          /*!< 传输长度为2个寄存器，起始地址由 TIMx_CR1 + TIMx_DCR.DBA 决定  */
 #define TIM_DMABURSTLENGTH_3TRANSFERS      0x00000200U                          /*!< 传输长度为3个寄存器，起始地址由 TIMx_CR1 + TIMx_DCR.DBA 决定  */
@@ -25,10 +25,10 @@
   * @}
   */
 
-/** @defgroup DMA_Handle_index TIM DMA Handle Index
+/** @defgroup DMA_Handle_index TIM DMA 句柄索引
   * @{
   */
-// 定义DMA句柄的索引，用于在定时器结构体中查找对应的DMA句柄
+/* DMA句柄索引定义，用于在定时器结构体中索引不同的DMA句柄 */
 #define TIM_DMA_ID_UPDATE                ((uint16_t) 0x0000)       /*!< 用于更新事件的DMA句柄索引 */
 #define TIM_DMA_ID_CC1                   ((uint16_t) 0x0001)       /*!< 用于捕获/比较通道1的DMA句柄索引 */
 #define TIM_DMA_ID_CC2                   ((uint16_t) 0x0002)       /*!< 用于捕获/比较通道2的DMA句柄索引 */
@@ -40,14 +40,14 @@
   * @}
   */
 
-/** @defgroup Channel_CC_State TIM Capture/Compare Channel State
+/** @defgroup Channel_CC_State TIM 捕获/比较通道状态
   * @{
   */
-// 定义通道状态，用于标记通道是否使能
+/* 通道使能状态定义 */
 #define TIM_CCx_ENABLE                   0x00000001U                            /*!< 输入或输出通道已使能 */
-#define TIM_CCx_DISABLE                  0x00000000U                            /*!< 输入或输出通道已禁用 */
+#define TIM_CCx_DISABLE                  0x00000000U                            /*!< 输入或输出通道已禁能 */
 #define TIM_CCxN_ENABLE                  0x00000004U                            /*!< 互补输出通道已使能 */
-#define TIM_CCxN_DISABLE                 0x00000000U                            /*!< 互补输出通道已禁用 */
+#define TIM_CCxN_DISABLE                 0x00000000U                            /*!< 互补输出通道已禁能 */
 /**
   * @}
   */
@@ -55,23 +55,19 @@
 /**
   * @}
   */
-/* End of exported constants -------------------------------------------------*/
-/* 导出常量结束 */
+/* 导出常量结束 -------------------------------------------------*/
 
-/* Exported macros -----------------------------------------------------------*/
-/** @defgroup TIM_Exported_Macros TIM Exported Macros
+/* 导出宏定义 -----------------------------------------------------------*/
+/** @defgroup TIM_Exported_Macros TIM 导出宏
   * @{
   */
 
-/** @brief  Reset TIM handle state.
-  * @brief  复位TIM句柄状态。
-  * @param  __HANDLE__ TIM handle.
-  * @param  __HANDLE__ TIM句柄。
-  * @retval None
+/** @brief  复位 TIM 句柄状态。
+  * @param  __HANDLE__ TIM 句柄。
   * @retval 无
   */
+/* 如果定义了使用HAL库注册回调函数功能，则复位时需要将回调函数指针置空 */
 #if (USE_HAL_TIM_REGISTER_CALLBACKS == 1)
-// 如果启用了回调函数注册功能，则需要将所有的回调函数指针重置为NULL
 #define __HAL_TIM_RESET_HANDLE_STATE(__HANDLE__) do {                                                               \
                                                       (__HANDLE__)->State            = HAL_TIM_STATE_RESET;         \
                                                       (__HANDLE__)->ChannelState[0]  = HAL_TIM_CHANNEL_STATE_RESET; \
@@ -99,7 +95,7 @@
                                                       (__HANDLE__)->HallSensor_MspDeInitCallback = NULL;            \
                                                      } while(0)
 #else
-// 如果未启用回调函数注册功能，则只复位状态标志
+/* 如果未使用回调函数注册功能，则仅复位状态标志位 */
 #define __HAL_TIM_RESET_HANDLE_STATE(__HANDLE__) do {                                                               \
                                                       (__HANDLE__)->State            = HAL_TIM_STATE_RESET;         \
                                                       (__HANDLE__)->ChannelState[0]  = HAL_TIM_CHANNEL_STATE_RESET; \
@@ -115,314 +111,246 @@
 #endif /* USE_HAL_TIM_REGISTER_CALLBACKS */
 
 /**
-  * @brief  Enable the TIM peripheral.
-  * @brief  使能TIM外设（计数器）。
-  * @param  __HANDLE__ TIM handle
-  * @param  __HANDLE__ TIM句柄
-  * @retval None
+  * @brief  使能 TIM 外设。
+  * @param  __HANDLE__ TIM 句柄
   * @retval 无
   */
-// 设置CR1寄存器的CEN位（Counter Enable），启动定时器计数
+/* 设置CR1寄存器的CEN位（Counter Enable），启动计数器 */
 #define __HAL_TIM_ENABLE(__HANDLE__)                 ((__HANDLE__)->Instance->CR1|=(TIM_CR1_CEN))
 
 /**
-  * @brief  Enable the TIM main Output.
-  * @brief  使能TIM主输出。
-  * @param  __HANDLE__ TIM handle
-  * @param  __HANDLE__ TIM句柄
-  * @retval None
+  * @brief  使能 TIM 主输出。
+  * @param  __HANDLE__ TIM 句柄
   * @retval 无
   */
-// 设置BDTR寄存器的MOE位，使能主输出，这对于高级定时器输出PWM至关重要
+/* 设置BDTR寄存器的MOE位，只有在MOE=1时，OCx和OCxN输出才有效。常用于PWM输出 */
 #define __HAL_TIM_MOE_ENABLE(__HANDLE__)             ((__HANDLE__)->Instance->BDTR|=(TIM_BDTR_MOE))
 
 /**
-  * @brief  Disable the TIM peripheral.
-  * @brief  禁用TIM外设（计数器）。
-  * @param  __HANDLE__ TIM handle
-  * @param  __HANDLE__ TIM句柄
-  * @retval None
+  * @brief  禁能 TIM 外设。
+  * @param  __HANDLE__ TIM 句柄
   * @retval 无
   */
-// 只有当所有通道(CCxE)和互补通道(CCxNE)都未使能时，才关闭计数器，防止PWM输出异常
+/* 关闭计数器前需要检查通道状态，防止正在输出PWM时突然关闭导致电平异常 */
 #define __HAL_TIM_DISABLE(__HANDLE__) \
   do { \
+    /* 检查所有普通通道(CCxE)是否已关闭 */ \
     if (((__HANDLE__)->Instance->CCER & TIM_CCER_CCxE_MASK) == 0UL) \
     { \
+      /* 检查所有互补通道(CCxNE)是否已关闭 */ \
       if(((__HANDLE__)->Instance->CCER & TIM_CCER_CCxNE_MASK) == 0UL) \
       { \
+        /* 如果通道都已关闭，则安全关闭计数器 */ \
         (__HANDLE__)->Instance->CR1 &= ~(TIM_CR1_CEN); \
       } \
     } \
   } while(0)
 
 /**
-  * @brief  Disable the TIM main Output.
-  * @brief  禁用TIM主输出。
-  * @param  __HANDLE__ TIM handle
-  * @param  __HANDLE__ TIM句柄
-  * @retval None
+  * @brief  禁能 TIM 主输出。
+  * @param  __HANDLE__ TIM 句柄
   * @retval 无
-  * @note The Main Output Enable of a timer instance is disabled only if all the CCx and CCxN channels have been
-  *       disabled
-  * @note 只有当所有的CCx和CCxN通道都被禁用时，定时器的主输出使能才会被禁用
+  * @note 只有当所有的 CCx 和 CCxN 通道都被禁能时，定时器实例的主输出使能才会被禁能
   */
-// 只有当所有通道(CCxE)和互补通道(CCxNE)都未使能时，才关闭主输出(MOE)
+/* 关闭主输出前同样需要检查通道状态，确保安全 */
 #define __HAL_TIM_MOE_DISABLE(__HANDLE__) \
   do { \
+    /* 检查所有普通通道(CCxE)是否已关闭 */ \
     if (((__HANDLE__)->Instance->CCER & TIM_CCER_CCxE_MASK) == 0UL) \
     { \
+      /* 检查所有互补通道(CCxNE)是否已关闭 */ \
       if(((__HANDLE__)->Instance->CCER & TIM_CCER_CCxNE_MASK) == 0UL) \
       { \
+        /* 如果通道都已关闭，则关闭主输出MOE位 */ \
         (__HANDLE__)->Instance->BDTR &= ~(TIM_BDTR_MOE); \
       } \
     } \
   } while(0)
 
 /**
-  * @brief  Disable the TIM main Output.
-  * @brief  无条件禁用TIM主输出。
-  * @param  __HANDLE__ TIM handle
-  * @param  __HANDLE__ TIM句柄
-  * @retval None
+  * @brief  禁能 TIM 主输出。
+  * @param  __HANDLE__ TIM 句柄
   * @retval 无
-  * @note The Main Output Enable of a timer instance is disabled unconditionally
-  * @note 定时器实例的主输出使能无条件禁用
+  * @note 无条件禁能定时器实例的主输出使能
   */
-// 直接清除MOE位，不检查通道状态
+/* 无条件强制关闭主输出，不检查通道状态，用于紧急情况或强制复位 */
 #define __HAL_TIM_MOE_DISABLE_UNCONDITIONALLY(__HANDLE__)  (__HANDLE__)->Instance->BDTR &= ~(TIM_BDTR_MOE)
 
-/** @brief  Enable the specified TIM interrupt.
-  * @brief  使能指定的TIM中断。
-  * @param  __HANDLE__ specifies the TIM Handle.
-  * @param  __HANDLE__ 指定TIM句柄。
-  * @param  __INTERRUPT__ specifies the TIM interrupt source to enable.
-  * @param  __INTERRUPT__ 指定要使能的TIM中断源。
-  *          This parameter can be one of the following values:
-  *          该参数可以是以下值之一：
-  *            @arg TIM_IT_UPDATE: Update interrupt (更新中断)
-  *            @arg TIM_IT_CC1:   Capture/Compare 1 interrupt (捕获/比较1中断)
-  *            @arg TIM_IT_CC2:  Capture/Compare 2 interrupt (捕获/比较2中断)
-  *            @arg TIM_IT_CC3:  Capture/Compare 3 interrupt (捕获/比较3中断)
-  *            @arg TIM_IT_CC4:  Capture/Compare 4 interrupt (捕获/比较4中断)
-  *            @arg TIM_IT_COM:   Commutation interrupt (换相中断)
-  *            @arg TIM_IT_TRIGGER: Trigger interrupt (触发中断)
-  *            @arg TIM_IT_BREAK: Break interrupt (刹车中断)
-  * @retval None
+/** @brief  使能指定的 TIM 中断。
+  * @param  __HANDLE__ 指定 TIM 句柄。
+  * @param  __INTERRUPT__ 指定要使能的 TIM 中断源。
+  *          该参数可以是以下值之一:
+  *            @arg TIM_IT_UPDATE: 更新中断
+  *            @arg TIM_IT_CC1:   捕获/比较1中断
+  *            @arg TIM_IT_CC2:  捕获/比较2中断
+  *            @arg TIM_IT_CC3:  捕获/比较3中断
+  *            @arg TIM_IT_CC4:  捕获/比较4中断
+  *            @arg TIM_IT_COM:   换相中断
+  *            @arg TIM_IT_TRIGGER: 触发中断
+  *            @arg TIM_IT_BREAK: 刹车中断
   * @retval 无
   */
-// 设置DIER寄存器的对应位，使能中断
+/* 设置DIER寄存器中的中断使能位 */
 #define __HAL_TIM_ENABLE_IT(__HANDLE__, __INTERRUPT__)    ((__HANDLE__)->Instance->DIER |= (__INTERRUPT__))
 
-/** @brief  Disable the specified TIM interrupt.
-  * @brief  禁用指定的TIM中断。
-  * @param  __HANDLE__ specifies the TIM Handle.
-  * @param  __HANDLE__ 指定TIM句柄。
-  * @param  __INTERRUPT__ specifies the TIM interrupt source to disable.
-  * @param  __INTERRUPT__ 指定要禁用的TIM中断源。
-  *          This parameter can be one of the following values:
-  *          该参数可以是以下值之一：
-  *            @arg TIM_IT_UPDATE: Update interrupt (更新中断)
-  *            @arg TIM_IT_CC1:   Capture/Compare 1 interrupt (捕获/比较1中断)
-  *            @arg TIM_IT_CC2:  Capture/Compare 2 interrupt (捕获/比较2中断)
-  *            @arg TIM_IT_CC3:  Capture/Compare 3 interrupt (捕获/比较3中断)
-  *            @arg TIM_IT_CC4:  Capture/Compare 4 interrupt (捕获/比较4中断)
-  *            @arg TIM_IT_COM:   Commutation interrupt (换相中断)
-  *            @arg TIM_IT_TRIGGER: Trigger interrupt (触发中断)
-  *            @arg TIM_IT_BREAK: Break interrupt (刹车中断)
-  * @retval None
+/** @brief  禁能指定的 TIM 中断。
+  * @param  __HANDLE__ 指定 TIM 句柄。
+  * @param  __INTERRUPT__ 指定要禁能的 TIM 中断源。
+  *          该参数可以是以下值之一:
+  *            @arg TIM_IT_UPDATE: 更新中断
+  *            @arg TIM_IT_CC1:   捕获/比较1中断
+  *            @arg TIM_IT_CC2:  捕获/比较2中断
+  *            @arg TIM_IT_CC3:  捕获/比较3中断
+  *            @arg TIM_IT_CC4:  捕获/比较4中断
+  *            @arg TIM_IT_COM:   换相中断
+  *            @arg TIM_IT_TRIGGER: 触发中断
+  *            @arg TIM_IT_BREAK: 刹车中断
   * @retval 无
   */
-// 清除DIER寄存器的对应位，禁用中断
+/* 清除DIER寄存器中的中断使能位 */
 #define __HAL_TIM_DISABLE_IT(__HANDLE__, __INTERRUPT__)   ((__HANDLE__)->Instance->DIER &= ~(__INTERRUPT__))
 
-/** @brief  Enable the specified DMA request.
-  * @brief  使能指定的DMA请求。
-  * @param  __HANDLE__ specifies the TIM Handle.
-  * @param  __HANDLE__ 指定TIM句柄。
-  * @param  __DMA__ specifies the TIM DMA request to enable.
-  * @param  __DMA__ 指定要使能的TIM DMA请求。
-  *          This parameter can be one of the following values:
-  *          该参数可以是以下值之一：
-  *            @arg TIM_DMA_UPDATE: Update DMA request (更新DMA请求)
-  *            @arg TIM_DMA_CC1:   Capture/Compare 1 DMA request (捕获/比较1 DMA请求)
-  *            @arg TIM_DMA_CC2:  Capture/Compare 2 DMA request (捕获/比较2 DMA请求)
-  *            @arg TIM_DMA_CC3:  Capture/Compare 3 DMA request (捕获/比较3 DMA请求)
-  *            @arg TIM_DMA_CC4:  Capture/Compare 4 DMA request (捕获/比较4 DMA请求)
-  *            @arg TIM_DMA_COM:   Commutation DMA request (换相DMA请求)
-  *            @arg TIM_DMA_TRIGGER: Trigger DMA request (触发DMA请求)
-  * @retval None
+/** @brief  使能指定的 DMA 请求。
+  * @param  __HANDLE__ 指定 TIM 句柄。
+  * @param  __DMA__ 指定要使能的 TIM DMA 请求。
+  *          该参数可以是以下值之一:
+  *            @arg TIM_DMA_UPDATE: 更新 DMA 请求
+  *            @arg TIM_DMA_CC1:   捕获/比较1 DMA 请求
+  *            @arg TIM_DMA_CC2:  捕获/比较2 DMA 请求
+  *            @arg TIM_DMA_CC3:  捕获/比较3 DMA 请求
+  *            @arg TIM_DMA_CC4:  捕获/比较4 DMA 请求
+  *            @arg TIM_DMA_COM:   换相 DMA 请求
+  *            @arg TIM_DMA_TRIGGER: 触发 DMA 请求
   * @retval 无
   */
-// 设置DIER寄存器的对应位，使能DMA请求
+/* 设置DIER寄存器中的DMA使能位 */
 #define __HAL_TIM_ENABLE_DMA(__HANDLE__, __DMA__)         ((__HANDLE__)->Instance->DIER |= (__DMA__))
 
-/** @brief  Disable the specified DMA request.
-  * @brief  禁用指定的DMA请求。
-  * @param  __HANDLE__ specifies the TIM Handle.
-  * @param  __HANDLE__ 指定TIM句柄。
-  * @param  __DMA__ specifies the TIM DMA request to disable.
-  * @param  __DMA__ 指定要禁用的TIM DMA请求。
-  *          This parameter can be one of the following values:
-  *          该参数可以是以下值之一：
-  *            @arg TIM_DMA_UPDATE: Update DMA request (更新DMA请求)
-  *            @arg TIM_DMA_CC1:   Capture/Compare 1 DMA request (捕获/比较1 DMA请求)
-  *            @arg TIM_DMA_CC2:  Capture/Compare 2 DMA request (捕获/比较2 DMA请求)
-  *            @arg TIM_DMA_CC3:  Capture/Compare 3 DMA request (捕获/比较3 DMA请求)
-  *            @arg TIM_DMA_CC4:  Capture/Compare 4 DMA request (捕获/比较4 DMA请求)
-  *            @arg TIM_DMA_COM:   Commutation DMA request (换相DMA请求)
-  *            @arg TIM_DMA_TRIGGER: Trigger DMA request (触发DMA请求)
-  * @retval None
+/** @brief  禁能指定的 DMA 请求。
+  * @param  __HANDLE__ 指定 TIM 句柄。
+  * @param  __DMA__ 指定要禁能的 TIM DMA 请求。
+  *          该参数可以是以下值之一:
+  *            @arg TIM_DMA_UPDATE: 更新 DMA 请求
+  *            @arg TIM_DMA_CC1:   捕获/比较1 DMA 请求
+  *            @arg TIM_DMA_CC2:  捕获/比较2 DMA 请求
+  *            @arg TIM_DMA_CC3:  捕获/比较3 DMA 请求
+  *            @arg TIM_DMA_CC4:  捕获/比较4 DMA 请求
+  *            @arg TIM_DMA_COM:   换相 DMA 请求
+  *            @arg TIM_DMA_TRIGGER: 触发 DMA 请求
   * @retval 无
   */
-// 清除DIER寄存器的对应位，禁用DMA请求
+/* 清除DIER寄存器中的DMA使能位 */
 #define __HAL_TIM_DISABLE_DMA(__HANDLE__, __DMA__)        ((__HANDLE__)->Instance->DIER &= ~(__DMA__))
 
-/** @brief  Check whether the specified TIM interrupt flag is set or not.
-  * @brief  检查指定的TIM中断标志位是否被置位。
-  * @param  __HANDLE__ specifies the TIM Handle.
-  * @param  __HANDLE__ 指定TIM句柄。
-  * @param  __FLAG__ specifies the TIM interrupt flag to check.
-  * @param  __FLAG__ 指定要检查的TIM中断标志位。
-  *        This parameter can be one of the following values:
-  *        该参数可以是以下值之一：
-  *            @arg TIM_FLAG_UPDATE: Update interrupt flag (更新中断标志)
-  *            @arg TIM_FLAG_CC1: Capture/Compare 1 interrupt flag (捕获/比较1中断标志)
-  *            @arg TIM_FLAG_CC2: Capture/Compare 2 interrupt flag (捕获/比较2中断标志)
-  *            @arg TIM_FLAG_CC3: Capture/Compare 3 interrupt flag (捕获/比较3中断标志)
-  *            @arg TIM_FLAG_CC4: Capture/Compare 4 interrupt flag (捕获/比较4中断标志)
-  *            @arg TIM_FLAG_COM:  Commutation interrupt flag (换相中断标志)
-  *            @arg TIM_FLAG_TRIGGER: Trigger interrupt flag (触发中断标志)
-  *            @arg TIM_FLAG_BREAK: Break interrupt flag (刹车中断标志)
-  *            @arg TIM_FLAG_CC1OF: Capture/Compare 1 overcapture flag (捕获/比较1过捕获标志)
-  *            @arg TIM_FLAG_CC2OF: Capture/Compare 2 overcapture flag (捕获/比较2过捕获标志)
-  *            @arg TIM_FLAG_CC3OF: Capture/Compare 3 overcapture flag (捕获/比较3过捕获标志)
-  *            @arg TIM_FLAG_CC4OF: Capture/Compare 4 overcapture flag (捕获/比较4过捕获标志)
-  * @retval The new state of __FLAG__ (TRUE or FALSE).
-  * @retval __FLAG__的新状态 (TRUE 或 FALSE)。
+/** @brief  检查指定的 TIM 中断标志位是否被置位。
+  * @param  __HANDLE__ 指定 TIM 句柄。
+  * @param  __FLAG__ 指定要检查的 TIM 中断标志位。
+  *        该参数可以是以下值之一:
+  *            @arg TIM_FLAG_UPDATE: 更新中断标志
+  *            @arg TIM_FLAG_CC1: 捕获/比较1 中断标志
+  *            @arg TIM_FLAG_CC2: 捕获/比较2 中断标志
+  *            @arg TIM_FLAG_CC3: 捕获/比较3 中断标志
+  *            @arg TIM_FLAG_CC4: 捕获/比较4 中断标志
+  *            @arg TIM_FLAG_COM:  换相中断标志
+  *            @arg TIM_FLAG_TRIGGER: 触发中断标志
+  *            @arg TIM_FLAG_BREAK: 刹车中断标志
+  *            @arg TIM_FLAG_CC1OF: 捕获/比较1 溢出标志
+  *            @arg TIM_FLAG_CC2OF: 捕获/比较2 溢出标志
+  *            @arg TIM_FLAG_CC3OF: 捕获/比较3 溢出标志
+  *            @arg TIM_FLAG_CC4OF: 捕获/比较4 溢出标志
+  * @retval __FLAG__ 的新状态 (TRUE 或 FALSE)。
   */
-// 读取SR寄存器，检查指定标志位是否置位
+/* 读取SR寄存器，判断指定标志位是否置1 */
 #define __HAL_TIM_GET_FLAG(__HANDLE__, __FLAG__)          (((__HANDLE__)->Instance->SR &(__FLAG__)) == (__FLAG__))
 
-/** @brief  Clear the specified TIM interrupt flag.
-  * @brief  清除指定的TIM中断标志位。
-  * @param  __HANDLE__ specifies the TIM Handle.
-  * @param  __HANDLE__ 指定TIM句柄。
-  * @param  __FLAG__ specifies the TIM interrupt flag to clear.
-  * @param  __FLAG__ 指定要清除的TIM中断标志位。
-  *        This parameter can be one of the following values:
-  *        该参数可以是以下值之一：
-  *            @arg TIM_FLAG_UPDATE: Update interrupt flag (更新中断标志)
-  *            @arg TIM_FLAG_CC1: Capture/Compare 1 interrupt flag (捕获/比较1中断标志)
-  *            @arg TIM_FLAG_CC2: Capture/Compare 2 interrupt flag (捕获/比较2中断标志)
-  *            @arg TIM_FLAG_CC3: Capture/Compare 3 interrupt flag (捕获/比较3中断标志)
-  *            @arg TIM_FLAG_CC4: Capture/Compare 4 interrupt flag (捕获/比较4中断标志)
-  *            @arg TIM_FLAG_COM:  Commutation interrupt flag (换相中断标志)
-  *            @arg TIM_FLAG_TRIGGER: Trigger interrupt flag (触发中断标志)
-  *            @arg TIM_FLAG_BREAK: Break interrupt flag (刹车中断标志)
-  *            @arg TIM_FLAG_CC1OF: Capture/Compare 1 overcapture flag (捕获/比较1过捕获标志)
-  *            @arg TIM_FLAG_CC2OF: Capture/Compare 2 overcapture flag (捕获/比较2过捕获标志)
-  *            @arg TIM_FLAG_CC3OF: Capture/Compare 3 overcapture flag (捕获/比较3过捕获标志)
-  *            @arg TIM_FLAG_CC4OF: Capture/Compare 4 overcapture flag (捕获/比较4过捕获标志)
-  * @retval The new state of __FLAG__ (TRUE or FALSE).
-  * @retval __FLAG__的新状态 (TRUE 或 FALSE)。
+/** @brief  清除指定的 TIM 中断标志位。
+  * @param  __HANDLE__ 指定 TIM 句柄。
+  * @param  __FLAG__ 指定要清除的 TIM 中断标志位。
+  *        该参数可以是以下值之一:
+  *            @arg TIM_FLAG_UPDATE: 更新中断标志
+  *            @arg TIM_FLAG_CC1: 捕获/比较1 中断标志
+  *            @arg TIM_FLAG_CC2: 捕获/比较2 中断标志
+  *            @arg TIM_FLAG_CC3: 捕获/比较3 中断标志
+  *            @arg TIM_FLAG_CC4: 捕获/比较4 中断标志
+  *            @arg TIM_FLAG_COM:  换相中断标志
+  *            @arg TIM_FLAG_TRIGGER: 触发中断标志
+  *            @arg TIM_FLAG_BREAK: 刹车中断标志
+  *            @arg TIM_FLAG_CC1OF: 捕获/比较1 溢出标志
+  *            @arg TIM_FLAG_CC2OF: 捕获/比较2 溢出标志
+  *            @arg TIM_FLAG_CC3OF: 捕获/比较3 溢出标志
+  *            @arg TIM_FLAG_CC4OF: 捕获/比较4 溢出标志
+  * @retval __FLAG__ 的新状态 (TRUE 或 FALSE)。
   */
-// 向SR寄存器写入取反后的值来清除标志位（这是STM32硬件特性，写0清除，写1无影响，这里通过写反码实现）
+/* 向SR寄存器写入取反后的标志位来清除标志（硬件特性：写0无作用，写1清除，这里通过写~FLAG实现写0清除） */
 #define __HAL_TIM_CLEAR_FLAG(__HANDLE__, __FLAG__)        ((__HANDLE__)->Instance->SR = ~(__FLAG__))
 
 /**
-  * @brief  Check whether the specified TIM interrupt source is enabled or not.
-  * @brief  检查指定的TIM中断源是否已使能。
-  * @param  __HANDLE__ TIM handle
-  * @param  __HANDLE__ TIM句柄
-  * @param  __INTERRUPT__ specifies the TIM interrupt source to check.
-  * @param  __INTERRUPT__ 指定要检查的TIM中断源。
-  *          This parameter can be one of the following values:
-  *          该参数可以是以下值之一：
-  *            @arg TIM_IT_UPDATE: Update interrupt (更新中断)
-  *            @arg TIM_IT_CC1:   Capture/Compare 1 interrupt (捕获/比较1中断)
-  *            @arg TIM_IT_CC2:  Capture/Compare 2 interrupt (捕获/比较2中断)
-  *            @arg TIM_IT_CC3:  Capture/Compare 3 interrupt (捕获/比较3中断)
-  *            @arg TIM_IT_CC4:  Capture/Compare 4 interrupt (捕获/比较4中断)
-  *            @arg TIM_IT_COM:   Commutation interrupt (换相中断)
-  *            @arg TIM_IT_TRIGGER: Trigger interrupt (触发中断)
-  *            @arg TIM_IT_BREAK: Break interrupt (刹车中断)
-  * @retval The state of TIM_IT (SET or RESET).
-  * @retval TIM_IT的状态 (SET 或 RESET)。
+  * @brief  检查指定的 TIM 中断源是否已使能。
+  * @param  __HANDLE__ TIM 句柄
+  * @param  __INTERRUPT__ 指定要检查的 TIM 中断源。
+  *          该参数可以是以下值之一:
+  *            @arg TIM_IT_UPDATE: 更新中断
+  *            @arg TIM_IT_CC1:   捕获/比较1中断
+  *            @arg TIM_IT_CC2:  捕获/比较2中断
+  *            @arg TIM_IT_CC3:  捕获/比较3中断
+  *            @arg TIM_IT_CC4:  捕获/比较4中断
+  *            @arg TIM_IT_COM:   换相中断
+  *            @arg TIM_IT_TRIGGER: 触发中断
+  *            @arg TIM_IT_BREAK: 刹车中断
+  * @retval TIM_IT 的状态 (SET 或 RESET)。
   */
-// 检查DIER寄存器中的中断使能位是否置位
+/* 检查DIER寄存器中的中断使能位是否置1 */
 #define __HAL_TIM_GET_IT_SOURCE(__HANDLE__, __INTERRUPT__) ((((__HANDLE__)->Instance->DIER & (__INTERRUPT__)) \
                                                              == (__INTERRUPT__)) ? SET : RESET)
 
-/** @brief Clear the TIM interrupt pending bits.
-  * @brief  清除TIM中断挂起位。
-  * @param  __HANDLE__ TIM handle
-  * @param  __HANDLE__ TIM句柄
-  * @param  __INTERRUPT__ specifies the interrupt pending bit to clear.
+/** @brief 清除 TIM 中断挂起位。
+  * @param  __HANDLE__ TIM 句柄
   * @param  __INTERRUPT__ 指定要清除的中断挂起位。
-  *          This parameter can be one of the following values:
-  *          该参数可以是以下值之一：
-  *            @arg TIM_IT_UPDATE: Update interrupt (更新中断)
-  *            @arg TIM_IT_CC1:   Capture/Compare 1 interrupt (捕获/比较1中断)
-  *            @arg TIM_IT_CC2:  Capture/Compare 2 interrupt (捕获/比较2中断)
-  *            @arg TIM_IT_CC3:  Capture/Compare 3 interrupt (捕获/比较3中断)
-  *            @arg TIM_IT_CC4:  Capture/Compare 4 interrupt (捕获/比较4中断)
-  *            @arg TIM_IT_COM:   Commutation interrupt (换相中断)
-  *            @arg TIM_IT_TRIGGER: Trigger interrupt (触发中断)
-  *            @arg TIM_IT_BREAK: Break interrupt (刹车中断)
-  * @retval None
+  *          该参数可以是以下值之一:
+  *            @arg TIM_IT_UPDATE: 更新中断
+  *            @arg TIM_IT_CC1:   捕获/比较1中断
+  *            @arg TIM_IT_CC2:  捕获/比较2中断
+  *            @arg TIM_IT_CC3:  捕获/比较3中断
+  *            @arg TIM_IT_CC4:  捕获/比较4中断
+  *            @arg TIM_IT_COM:   换相中断
+  *            @arg TIM_IT_TRIGGER: 触发中断
+  *            @arg TIM_IT_BREAK: 刹车中断
   * @retval 无
   */
-// 此宏功能与__HAL_TIM_CLEAR_FLAG类似，用于清除中断标志
+/* 清除SR寄存器中的中断标志，与CLEAR_FLAG功能类似，常用于中断服务函数中 */
 #define __HAL_TIM_CLEAR_IT(__HANDLE__, __INTERRUPT__)      ((__HANDLE__)->Instance->SR = ~(__INTERRUPT__))
 
 /**
-  * @brief  Indicates whether or not the TIM Counter is used as downcounter.
-  * @brief  指示TIM计数器是否正在向下计数。
-  * @param  __HANDLE__ TIM handle.
-  * @param  __HANDLE__ TIM句柄。
-  * @retval False (Counter used as upcounter) or True (Counter used as downcounter)
-  * @retval False (计数器用作向上计数) 或 True (计数器用作向下计数)
-  * @note This macro is particularly useful to get the counting mode when the timer operates in Center-aligned mode
-  *       or Encoder mode.
-  * @note 当定时器工作在中心对齐模式或编码器模式时，此宏对于获取计数方向特别有用。
+  * @brief  指示 TIM 计数器是否用作递减计数器。
+  * @param  __HANDLE__ TIM 句柄。
+  * @retval False (计数器用作递增计数) 或 True (计数器用作递减计数)
+  * @note 该宏在定时器工作在中心对齐模式或编码器模式时，对于获取计数方向特别有用。
   */
-// 读取CR1寄存器的DIR位，判断当前计数方向
+/* 读取CR1寄存器的DIR位，判断当前计数方向 */
 #define __HAL_TIM_IS_TIM_COUNTING_DOWN(__HANDLE__)    (((__HANDLE__)->Instance->CR1 &(TIM_CR1_DIR)) == (TIM_CR1_DIR))
 
 /**
-  * @brief  Set the TIM Prescaler on runtime.
-  * @brief  在运行时设置TIM预分频器。
-  * @param  __HANDLE__ TIM handle.
-  * @param  __HANDLE__ TIM句柄。
-  * @param  __PRESC__ specifies the Prescaler new value.
+  * @brief  在运行时设置 TIM 预分频器。
+  * @param  __HANDLE__ TIM 句柄。
   * @param  __PRESC__ 指定预分频器的新值。
-  * @retval None
   * @retval 无
   */
-// 直接写入PSC寄存器，修改预分频系数
+/* 直接写入PSC寄存器，修改预分频系数。注意：新值会在下一个更新事件生效 */
 #define __HAL_TIM_SET_PRESCALER(__HANDLE__, __PRESC__)       ((__HANDLE__)->Instance->PSC = (__PRESC__))
 
 /**
-  * @brief  Set the TIM Counter Register value on runtime.
-  * @brief  在运行时设置TIM计数器寄存器值。
-  * @param  __HANDLE__ TIM handle.
-  * @param  __HANDLE__ TIM句柄。
-  * @param  __COUNTER__ specifies the Counter register new value.
+  * @brief  在运行时设置 TIM 计数器寄存器值。
+  * @param  __HANDLE__ TIM 句柄。
   * @param  __COUNTER__ 指定计数器寄存器的新值。
-  * @retval None
   * @retval 无
   */
-// 直接写入CNT寄存器，设置当前计数值
+/* 直接写入CNT寄存器，设置当前计数值 */
 #define __HAL_TIM_SET_COUNTER(__HANDLE__, __COUNTER__)  ((__HANDLE__)->Instance->CNT = (__COUNTER__))
 
 /**
-  * @brief  Get the TIM Counter Register value on runtime.
-  * @brief  在运行时获取TIM计数器寄存器值。
-  * @param  __HANDLE__ TIM handle.
-  * @param  __HANDLE__ TIM句柄。
-  * @retval 16-bit or 32-bit value of the timer counter register (TIMx_CNT)
-  * @retval 定时器计数器寄存器的16位或32位值 (TIMx_CNT)
+  * @brief  在运行时获取 TIM 计数器寄存器值。
+  * @param  __HANDLE__ TIM 句柄。
+  * @retval 16位或32位的定时器计数器寄存器值 (TIMx_CNT)
   */
-// 读取CNT寄存器，获取当前计数值
+/* 读取CNT寄存器，获取当前计数值 */
 #define __HAL_TIM_GET_COUNTER(__HANDLE__)  ((__HANDLE__)->Instance->CNT)

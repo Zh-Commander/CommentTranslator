@@ -5,7 +5,7 @@
   "temperature": 0.2,
   "top_p": 1,
   "timeout": 700,
-  "max_workers": 3,
+  "max_workers": 20,
   "input_dir": "code_input",
   "output_dir": "code_output",
   "split_dir": "temp/code_split",

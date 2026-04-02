@@ -1,5 +1,5 @@
-/* 检查定时器时钟源参数是否有效
-   包括：内部时钟、ETR模式1、ETR模式2、TI1边沿检测、TI1输入、TI2输入、内部触发0-3 */
+/* 检查定时器时钟源参数是否有效 */
+/* 包括：内部时钟、ETR模式1、ETR模式2、TI1边沿检测器、TI1、TI2、内部触发0-3 */
 #define IS_TIM_CLOCKSOURCE(__CLOCK__) (((__CLOCK__) == TIM_CLOCKSOURCE_INTERNAL) || \
                                        ((__CLOCK__) == TIM_CLOCKSOURCE_ETRMODE1) || \
                                        ((__CLOCK__) == TIM_CLOCKSOURCE_ETRMODE2) || \
@@ -11,82 +11,78 @@
                                        ((__CLOCK__) == TIM_CLOCKSOURCE_ITR2)     || \
                                        ((__CLOCK__) == TIM_CLOCKSOURCE_ITR3))
 
-/* 检查时钟极性参数是否有效
-   包括：反相、非反相、上升沿、下降沿、双边沿 */
+/* 检查时钟极性参数是否有效 */
+/* 包括：反相、非反相、上升沿、下降沿、双边沿 */
 #define IS_TIM_CLOCKPOLARITY(__POLARITY__) (((__POLARITY__) == TIM_CLOCKPOLARITY_INVERTED)    || \
                                             ((__POLARITY__) == TIM_CLOCKPOLARITY_NONINVERTED) || \
                                             ((__POLARITY__) == TIM_CLOCKPOLARITY_RISING)      || \
                                             ((__POLARITY__) == TIM_CLOCKPOLARITY_FALLING)     || \
                                             ((__POLARITY__) == TIM_CLOCKPOLARITY_BOTHEDGE))
 
-/* 检查时钟预分频参数是否有效
-   支持的分频系数：1、2、4、8 */
+/* 检查时钟预分频参数是否有效 */
+/* 预分频系数可选：1分频、2分频、4分频、8分频 */
 #define IS_TIM_CLOCKPRESCALER(__PRESCALER__) (((__PRESCALER__) == TIM_CLOCKPRESCALER_DIV1) || \
                                               ((__PRESCALER__) == TIM_CLOCKPRESCALER_DIV2) || \
                                               ((__PRESCALER__) == TIM_CLOCKPRESCALER_DIV4) || \
                                               ((__PRESCALER__) == TIM_CLOCKPRESCALER_DIV8))
 
-/* 检查时钟滤波参数是否有效
-   滤波值范围：0 到 15 (0xF) */
+/* 检查时钟滤波参数是否有效 */
+/* 滤波值范围：0 到 15 (0xF) */
 #define IS_TIM_CLOCKFILTER(__ICFILTER__)      ((__ICFILTER__) <= 0xFU)
 
-/* 检查清除输入极性参数是否有效
-   包括：反相、非反相 */
+/* 检查清除输入极性参数是否有效 */
+/* 包括：反相和非反相 */
 #define IS_TIM_CLEARINPUT_POLARITY(__POLARITY__) (((__POLARITY__) == TIM_CLEARINPUTPOLARITY_INVERTED) || \
                                                   ((__POLARITY__) == TIM_CLEARINPUTPOLARITY_NONINVERTED))
 
-/* 检查清除输入预分频参数是否有效
-   支持的分频系数：1、2、4、8 */
+/* 检查清除输入预分频参数是否有效 */
+/* 预分频系数可选：1分频、2分频、4分频、8分频 */
 #define IS_TIM_CLEARINPUT_PRESCALER(__PRESCALER__) (((__PRESCALER__) == TIM_CLEARINPUTPRESCALER_DIV1) || \
                                                     ((__PRESCALER__) == TIM_CLEARINPUTPRESCALER_DIV2) || \
                                                     ((__PRESCALER__) == TIM_CLEARINPUTPRESCALER_DIV4) || \
                                                     ((__PRESCALER__) == TIM_CLEARINPUTPRESCALER_DIV8))
 
-/* 检查清除输入滤波参数是否有效
-   滤波值范围：0 到 15 (0xF) */
+/* 检查清除输入滤波参数是否有效 */
+/* 滤波值范围：0 到 15 (0xF) */
 #define IS_TIM_CLEARINPUT_FILTER(__ICFILTER__) ((__ICFILTER__) <= 0xFU)
 
-/* 检查运行模式下的关闭状态配置
-   OSSR: Off-State Selection for Run mode
-   决定当MOE=1且通道无效时，输出引脚的状态 */
+/* 检查运行模式下的关闭状态选择参数是否有效 */
+/* 用于配置当MOE=0时，输出比较输出的状态 */
 #define IS_TIM_OSSR_STATE(__STATE__)       (((__STATE__) == TIM_OSSR_ENABLE) || \
                                             ((__STATE__) == TIM_OSSR_DISABLE))
 
-/* 检查空闲模式下的关闭状态配置
-   OSSI: Off-State Selection for Idle mode
-   决定当MOE=0且通道无效时，输出引脚的状态 */
+/* 检查空闲模式下的关闭状态选择参数是否有效 */
+/* 用于配置当MOE=0且OSSR=0时，输出比较输出的状态 */
 #define IS_TIM_OSSI_STATE(__STATE__)       (((__STATE__) == TIM_OSSI_ENABLE) || \
                                             ((__STATE__) == TIM_OSSI_DISABLE))
 
-/* 检查锁定级别参数是否有效
-   用于写保护，防止关键参数被意外修改
-   级别1、2、3提供不同程度的写保护 */
+/* 检查锁定级别参数是否有效 */
+/* 锁定级别用于写保护，防止关键参数被意外修改 */
 #define IS_TIM_LOCK_LEVEL(__LEVEL__)       (((__LEVEL__) == TIM_LOCKLEVEL_OFF) || \
                                             ((__LEVEL__) == TIM_LOCKLEVEL_1)   || \
                                             ((__LEVEL__) == TIM_LOCKLEVEL_2)   || \
                                             ((__LEVEL__) == TIM_LOCKLEVEL_3))
 
-/* 检查刹车滤波参数是否有效
-   滤波值范围：0 到 15 (0xFUL) */
+/* 检查刹车滤波参数是否有效 */
+/* 滤波值范围：0 到 15 (0xF) */
 #define IS_TIM_BREAK_FILTER(__BRKFILTER__) ((__BRKFILTER__) <= 0xFUL)
 
-/* 检查刹车功能使能状态
-   决定是否开启刹车输入功能 */
+/* 检查刹车功能使能状态参数是否有效 */
 #define IS_TIM_BREAK_STATE(__STATE__)      (((__STATE__) == TIM_BREAK_ENABLE) || \
                                             ((__STATE__) == TIM_BREAK_DISABLE))
 
-/* 检查刹车极性参数是否有效
-   决定刹车输入是低电平有效还是高电平有效 */
+/* 检查刹车极性参数是否有效 */
+/* 可配置为低电平有效或高电平有效 */
 #define IS_TIM_BREAK_POLARITY(__POLARITY__) (((__POLARITY__) == TIM_BREAKPOLARITY_LOW) || \
                                              ((__POLARITY__) == TIM_BREAKPOLARITY_HIGH))
 
-/* 检查自动输出使能状态
-   决定刹车事件发生后，是否自动恢复输出 */
+/* 检查自动输出使能状态参数是否有效 */
+/* 用于配置是否在更新事件时自动恢复输出 */
 #define IS_TIM_AUTOMATIC_OUTPUT_STATE(__STATE__) (((__STATE__) == TIM_AUTOMATICOUTPUT_ENABLE) || \
                                                   ((__STATE__) == TIM_AUTOMATICOUTPUT_DISABLE))
 
-/* 检查触发输出(TRGO)源参数是否有效
-   TRGO用于作为其他定时器或外设的触发源 */
+/* 检查触发输出(TRGO)源参数是否有效 */
+/* 包括：复位、使能、更新、OC1、OC1REF、OC2REF、OC3REF、OC4REF */
 #define IS_TIM_TRGO_SOURCE(__SOURCE__) (((__SOURCE__) == TIM_TRGO_RESET)  || \
                                         ((__SOURCE__) == TIM_TRGO_ENABLE) || \
                                         ((__SOURCE__) == TIM_TRGO_UPDATE) || \
@@ -96,27 +92,25 @@
                                         ((__SOURCE__) == TIM_TRGO_OC3REF) || \
                                         ((__SOURCE__) == TIM_TRGO_OC4REF))
 
-/* 检查主从模式配置参数是否有效
-   MSM: Master/Slave Mode
-   用于同步定时器级联 */
+/* 检查主从模式状态参数是否有效 */
 #define IS_TIM_MSM_STATE(__STATE__)      (((__STATE__) == TIM_MASTERSLAVEMODE_ENABLE) || \
                                           ((__STATE__) == TIM_MASTERSLAVEMODE_DISABLE))
 
-/* 检查从模式选择参数是否有效
-   包括：禁用、复位模式、门控模式、触发模式、外部时钟模式1 */
+/* 检查从模式参数是否有效 */
+/* 包括：禁用、复位模式、门控模式、触发模式、外部时钟模式1 */
 #define IS_TIM_SLAVE_MODE(__MODE__) (((__MODE__) == TIM_SLAVEMODE_DISABLE)   || \
                                      ((__MODE__) == TIM_SLAVEMODE_RESET)     || \
                                      ((__MODE__) == TIM_SLAVEMODE_GATED)     || \
                                      ((__MODE__) == TIM_SLAVEMODE_TRIGGER)   || \
                                      ((__MODE__) == TIM_SLAVEMODE_EXTERNAL1))
 
-/* 检查PWM模式参数是否有效
-   PWM1: 计数值<CCR时有效，PWM2: 计数值<CCR时无效 */
+/* 检查PWM模式参数是否有效 */
+/* 包括PWM模式1和PWM模式2 */
 #define IS_TIM_PWM_MODE(__MODE__) (((__MODE__) == TIM_OCMODE_PWM1)               || \
                                    ((__MODE__) == TIM_OCMODE_PWM2))
 
-/* 检查输出比较模式参数是否有效
-   包括：冻结、强制有效、强制无效、翻转、匹配时有效、匹配时无效 */
+/* 检查输出比较模式参数是否有效 */
+/* 包括：冻结、有效电平、无效电平、翻转、强制有效、强制无效 */
 #define IS_TIM_OC_MODE(__MODE__)  (((__MODE__) == TIM_OCMODE_TIMING)             || \
                                    ((__MODE__) == TIM_OCMODE_ACTIVE)             || \
                                    ((__MODE__) == TIM_OCMODE_INACTIVE)           || \
@@ -124,8 +118,8 @@
                                    ((__MODE__) == TIM_OCMODE_FORCED_ACTIVE)      || \
                                    ((__MODE__) == TIM_OCMODE_FORCED_INACTIVE))
 
-/* 检查触发选择参数是否有效
-   用于选择从模式的触发输入源 */
+/* 检查触发选择参数是否有效 */
+/* 用于选择从模式的内部触发或外部输入 */
 #define IS_TIM_TRIGGER_SELECTION(__SELECTION__) (((__SELECTION__) == TIM_TS_ITR0)    || \
                                                  ((__SELECTION__) == TIM_TS_ITR1)    || \
                                                  ((__SELECTION__) == TIM_TS_ITR2)    || \
@@ -143,6 +137,7 @@
                                                                ((__SELECTION__) == TIM_TS_NONE))
 
 /* 检查触发极性参数是否有效 */
+/* 包括：反相、非反相、上升沿、下降沿、双边沿 */
 #define IS_TIM_TRIGGERPOLARITY(__POLARITY__)   (((__POLARITY__) == TIM_TRIGGERPOLARITY_INVERTED   ) || \
                                                 ((__POLARITY__) == TIM_TRIGGERPOLARITY_NONINVERTED) || \
                                                 ((__POLARITY__) == TIM_TRIGGERPOLARITY_RISING     ) || \
@@ -158,13 +153,13 @@
 /* 检查触发滤波参数是否有效 */
 #define IS_TIM_TRIGGERFILTER(__ICFILTER__) ((__ICFILTER__) <= 0xFU)
 
-/* 检查TI1输入选择参数是否有效
-   CH1: 普通输入，XOR: TI1和TI2异或组合输入 */
+/* 检查TI1输入选择参数是否有效 */
+/* 可选择通道1或异或组合 */
 #define IS_TIM_TI1SELECTION(__TI1SELECTION__)  (((__TI1SELECTION__) == TIM_TI1SELECTION_CH1) || \
                                                 ((__TI1SELECTION__) == TIM_TI1SELECTION_XORCOMBINATION))
 
-/* 检查DMA突发传输长度参数是否有效
-   范围：1次到18次传输 */
+/* 检查DMA突发传输长度参数是否有效 */
+/* 传输次数范围：1次到18次 */
 #define IS_TIM_DMA_LENGTH(__LENGTH__)      (((__LENGTH__) == TIM_DMABURSTLENGTH_1TRANSFER)   || \
                                             ((__LENGTH__) == TIM_DMABURSTLENGTH_2TRANSFERS)  || \
                                             ((__LENGTH__) == TIM_DMABURSTLENGTH_3TRANSFERS)  || \
@@ -184,70 +179,70 @@
                                             ((__LENGTH__) == TIM_DMABURSTLENGTH_17TRANSFERS) || \
                                             ((__LENGTH__) == TIM_DMABURSTLENGTH_18TRANSFERS))
 
-/* 检查DMA数据长度参数是否有效
-   范围：1 到 65535 */
+/* 检查DMA数据长度参数是否有效 */
+/* 长度范围：1 到 65535 */
 #define IS_TIM_DMA_DATA_LENGTH(LENGTH) (((LENGTH) >= 0x1U) && ((LENGTH) < 0x10000U))
 
 /* 检查输入捕获滤波参数是否有效 */
 #define IS_TIM_IC_FILTER(__ICFILTER__)   ((__ICFILTER__) <= 0xFU)
 
-/* 检查死区时间参数是否有效
-   范围：0 到 255 */
+/* 检查死区时间参数是否有效 */
+/* 死区时间范围：0 到 255 */
 #define IS_TIM_DEADTIME(__DEADTIME__)    ((__DEADTIME__) <= 0xFFU)
 
 /* 检查从模式触发是否已使能 */
 #define IS_TIM_SLAVEMODE_TRIGGER_ENABLED(__TRIGGER__) ((__TRIGGER__) == TIM_SLAVEMODE_TRIGGER)
 
-/* 设置输入捕获预分频值宏函数
-   根据通道号，配置CCMR1或CCMR2寄存器中的ICxPSC位 */
+/* 设置输入捕获预分频值宏定义 */
+/* 根据通道号，配置对应的CCMR寄存器位 */
 #define TIM_SET_ICPRESCALERVALUE(__HANDLE__, __CHANNEL__, __ICPSC__) \
   (((__CHANNEL__) == TIM_CHANNEL_1) ? ((__HANDLE__)->Instance->CCMR1 |= (__ICPSC__)) :\
    ((__CHANNEL__) == TIM_CHANNEL_2) ? ((__HANDLE__)->Instance->CCMR1 |= ((__ICPSC__) << 8U)) :\
    ((__CHANNEL__) == TIM_CHANNEL_3) ? ((__HANDLE__)->Instance->CCMR2 |= (__ICPSC__)) :\
    ((__HANDLE__)->Instance->CCMR2 |= ((__ICPSC__) << 8U)))
 
-/* 复位输入捕获预分频值宏函数
-   清除CCMR1或CCMR2寄存器中的ICxPSC位 */
+/* 复位输入捕获预分频值宏定义 */
+/* 根据通道号，清除对应的CCMR寄存器位 */
 #define TIM_RESET_ICPRESCALERVALUE(__HANDLE__, __CHANNEL__) \
   (((__CHANNEL__) == TIM_CHANNEL_1) ? ((__HANDLE__)->Instance->CCMR1 &= ~TIM_CCMR1_IC1PSC) :\
    ((__CHANNEL__) == TIM_CHANNEL_2) ? ((__HANDLE__)->Instance->CCMR1 &= ~TIM_CCMR1_IC2PSC) :\
    ((__CHANNEL__) == TIM_CHANNEL_3) ? ((__HANDLE__)->Instance->CCMR2 &= ~TIM_CCMR2_IC3PSC) :\
    ((__HANDLE__)->Instance->CCMR2 &= ~TIM_CCMR2_IC4PSC))
 
-/* 设置捕获极性宏函数
-   根据通道号，配置CCER寄存器中的CCxP和CCxNP位 */
+/* 设置捕获极性宏定义 */
+/* 根据通道号，配置对应的CCER寄存器位 */
 #define TIM_SET_CAPTUREPOLARITY(__HANDLE__, __CHANNEL__, __POLARITY__) \
   (((__CHANNEL__) == TIM_CHANNEL_1) ? ((__HANDLE__)->Instance->CCER |= (__POLARITY__)) :\
    ((__CHANNEL__) == TIM_CHANNEL_2) ? ((__HANDLE__)->Instance->CCER |= ((__POLARITY__) << 4U)) :\
    ((__CHANNEL__) == TIM_CHANNEL_3) ? ((__HANDLE__)->Instance->CCER |= ((__POLARITY__) << 8U)) :\
    ((__HANDLE__)->Instance->CCER |= (((__POLARITY__) << 12U))))
 
-/* 复位捕获极性宏函数
-   清除CCER寄存器中的CCxP和CCxNP位 */
+/* 复位捕获极性宏定义 */
+/* 根据通道号，清除对应的CCER寄存器极性位 */
 #define TIM_RESET_CAPTUREPOLARITY(__HANDLE__, __CHANNEL__) \
   (((__CHANNEL__) == TIM_CHANNEL_1) ? ((__HANDLE__)->Instance->CCER &= ~(TIM_CCER_CC1P | TIM_CCER_CC1NP)) :\
    ((__CHANNEL__) == TIM_CHANNEL_2) ? ((__HANDLE__)->Instance->CCER &= ~(TIM_CCER_CC2P | TIM_CCER_CC2NP)) :\
    ((__CHANNEL__) == TIM_CHANNEL_3) ? ((__HANDLE__)->Instance->CCER &= ~(TIM_CCER_CC3P)) :\
    ((__HANDLE__)->Instance->CCER &= ~(TIM_CCER_CC4P)))
 
-/* 获取通道状态宏函数
-   从句柄结构体中读取对应通道的状态 */
+/* 获取通道状态宏定义 */
+/* 从句柄结构体中读取对应通道的状态 */
 #define TIM_CHANNEL_STATE_GET(__HANDLE__, __CHANNEL__)\
   (((__CHANNEL__) == TIM_CHANNEL_1) ? (__HANDLE__)->ChannelState[0] :\
    ((__CHANNEL__) == TIM_CHANNEL_2) ? (__HANDLE__)->ChannelState[1] :\
    ((__CHANNEL__) == TIM_CHANNEL_3) ? (__HANDLE__)->ChannelState[2] :\
    (__HANDLE__)->ChannelState[3])
 
-/* 设置通道状态宏函数
-   将状态值写入句柄结构体中对应的通道状态变量 */
+/* 设置通道状态宏定义 */
+/* 将状态值写入句柄结构体对应的通道状态变量 */
 #define TIM_CHANNEL_STATE_SET(__HANDLE__, __CHANNEL__, __CHANNEL_STATE__) \
   (((__CHANNEL__) == TIM_CHANNEL_1) ? ((__HANDLE__)->ChannelState[0] = (__CHANNEL_STATE__)) :\
    ((__CHANNEL__) == TIM_CHANNEL_2) ? ((__HANDLE__)->ChannelState[1] = (__CHANNEL_STATE__)) :\
    ((__CHANNEL__) == TIM_CHANNEL_3) ? ((__HANDLE__)->ChannelState[2] = (__CHANNEL_STATE__)) :\
    ((__HANDLE__)->ChannelState[3] = (__CHANNEL_STATE__)))
 
-/* 设置所有通道状态宏函数
-   统一设置所有4个通道的状态 */
+/* 设置所有通道状态宏定义 */
+/* 统一设置所有4个通道的状态 */
 #define TIM_CHANNEL_STATE_SET_ALL(__HANDLE__,  __CHANNEL_STATE__) do { \
                                                                        (__HANDLE__)->ChannelState[0]  = (__CHANNEL_STATE__);  \
                                                                        (__HANDLE__)->ChannelState[1]  = (__CHANNEL_STATE__);  \
@@ -255,21 +250,24 @@
                                                                        (__HANDLE__)->ChannelState[3]  = (__CHANNEL_STATE__);  \
                                                                      } while(0)
 
-/* 获取互补通道状态宏函数 */
+/* 获取互补通道状态宏定义 */
+/* 从句柄结构体中读取对应互补通道的状态 */
 #define TIM_CHANNEL_N_STATE_GET(__HANDLE__, __CHANNEL__)\
   (((__CHANNEL__) == TIM_CHANNEL_1) ? (__HANDLE__)->ChannelNState[0] :\
    ((__CHANNEL__) == TIM_CHANNEL_2) ? (__HANDLE__)->ChannelNState[1] :\
    ((__CHANNEL__) == TIM_CHANNEL_3) ? (__HANDLE__)->ChannelNState[2] :\
    (__HANDLE__)->ChannelNState[3])
 
-/* 设置互补通道状态宏函数 */
+/* 设置互补通道状态宏定义 */
+/* 将状态值写入句柄结构体对应的互补通道状态变量 */
 #define TIM_CHANNEL_N_STATE_SET(__HANDLE__, __CHANNEL__, __CHANNEL_STATE__) \
   (((__CHANNEL__) == TIM_CHANNEL_1) ? ((__HANDLE__)->ChannelNState[0] = (__CHANNEL_STATE__)) :\
    ((__CHANNEL__) == TIM_CHANNEL_2) ? ((__HANDLE__)->ChannelNState[1] = (__CHANNEL_STATE__)) :\
    ((__CHANNEL__) == TIM_CHANNEL_3) ? ((__HANDLE__)->ChannelNState[2] = (__CHANNEL_STATE__)) :\
    ((__HANDLE__)->ChannelNState[3] = (__CHANNEL_STATE__)))
 
-/* 设置所有互补通道状态宏函数 */
+/* 设置所有互补通道状态宏定义 */
+/* 统一设置所有4个互补通道的状态 */
 #define TIM_CHANNEL_N_STATE_SET_ALL(__HANDLE__,  __CHANNEL_STATE__) do { \
                                                                          (__HANDLE__)->ChannelNState[0] = \
                                                                          (__CHANNEL_STATE__);  \
@@ -286,7 +284,7 @@
   */
 /* 私有宏定义结束 -----------------------------------------------------*/
 
-/* 包含 TIM HAL 扩展模块头文件 */
+/* 包含 TIM HAL 扩展模块 */
 #include "stm32f1xx_hal_tim_ex.h"
 
 /* 导出函数 --------------------------------------------------------*/
@@ -459,7 +457,7 @@ HAL_StatusTypeDef HAL_TIM_IC_ConfigChannel(TIM_HandleTypeDef *htim, const TIM_IC
 /* 配置单脉冲通道 */
 HAL_StatusTypeDef HAL_TIM_OnePulse_ConfigChannel(TIM_HandleTypeDef *htim, TIM_OnePulse_InitTypeDef *sConfig,
                                                  uint32_t OutputChannel,  uint32_t InputChannel);
-/* 配置输出比较清除输入 */
+/* 配置输出比较参考清除 */
 HAL_StatusTypeDef HAL_TIM_ConfigOCrefClear(TIM_HandleTypeDef *htim,
                                            const TIM_ClearInputConfigTypeDef *sClearInputConfig,
                                            uint32_t Channel);
@@ -467,28 +465,28 @@ HAL_StatusTypeDef HAL_TIM_ConfigOCrefClear(TIM_HandleTypeDef *htim,
 HAL_StatusTypeDef HAL_TIM_ConfigClockSource(TIM_HandleTypeDef *htim, const TIM_ClockConfigTypeDef *sClockSourceConfig);
 /* 配置TI1输入 */
 HAL_StatusTypeDef HAL_TIM_ConfigTI1Input(TIM_HandleTypeDef *htim, uint32_t TI1_Selection);
-/* 从模式同步配置 */
+/* 同步配置从模式 */
 HAL_StatusTypeDef HAL_TIM_SlaveConfigSynchro(TIM_HandleTypeDef *htim, const TIM_SlaveConfigTypeDef *sSlaveConfig);
-/* 从模式同步配置(中断方式) */
+/* 中断方式同步配置从模式 */
 HAL_StatusTypeDef HAL_TIM_SlaveConfigSynchro_IT(TIM_HandleTypeDef *htim, const TIM_SlaveConfigTypeDef *sSlaveConfig);
-/* DMA突发写启动 */
+/* 启动DMA突发写操作 */
 HAL_StatusTypeDef HAL_TIM_DMABurst_WriteStart(TIM_HandleTypeDef *htim, uint32_t BurstBaseAddress,
                                               uint32_t BurstRequestSrc, const uint32_t  *BurstBuffer,
                                               uint32_t  BurstLength);
-/* DMA突发多次写启动 */
+/* 启动DMA多次突发写操作 */
 HAL_StatusTypeDef HAL_TIM_DMABurst_MultiWriteStart(TIM_HandleTypeDef *htim, uint32_t BurstBaseAddress,
                                                    uint32_t BurstRequestSrc, const uint32_t *BurstBuffer,
                                                    uint32_t BurstLength,  uint32_t DataLength);
-/* DMA突发写停止 */
+/* 停止DMA突发写操作 */
 HAL_StatusTypeDef HAL_TIM_DMABurst_WriteStop(TIM_HandleTypeDef *htim, uint32_t BurstRequestSrc);
-/* DMA突发读启动 */
+/* 启动DMA突发读操作 */
 HAL_StatusTypeDef HAL_TIM_DMABurst_ReadStart(TIM_HandleTypeDef *htim, uint32_t BurstBaseAddress,
                                              uint32_t BurstRequestSrc, uint32_t  *BurstBuffer, uint32_t  BurstLength);
-/* DMA突发多次读启动 */
+/* 启动DMA多次突发读操作 */
 HAL_StatusTypeDef HAL_TIM_DMABurst_MultiReadStart(TIM_HandleTypeDef *htim, uint32_t BurstBaseAddress,
                                                   uint32_t BurstRequestSrc, uint32_t  *BurstBuffer,
                                                   uint32_t  BurstLength, uint32_t  DataLength);
-/* DMA突发读停止 */
+/* 停止DMA突发读操作 */
 HAL_StatusTypeDef HAL_TIM_DMABurst_ReadStop(TIM_HandleTypeDef *htim, uint32_t BurstRequestSrc);
 /* 产生事件 */
 HAL_StatusTypeDef HAL_TIM_GenerateEvent(TIM_HandleTypeDef *htim, uint32_t EventSource);
@@ -502,26 +500,26 @@ uint32_t HAL_TIM_ReadCapturedValue(const TIM_HandleTypeDef *htim, uint32_t Chann
   *  @brief   TIM 回调函数
   * @{
   */
-/* 非阻塞模式下的回调函数 (中断和DMA) *******************************/
-/* 周期结束回调 */
+/* 非阻塞模式下的回调函数（中断和DMA） *******************************/
+/* 周期结束回调函数 */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim);
-/* 周期结束半完成回调(DMA双缓冲) */
+/* 周期结束半完成回调函数（用于DMA双缓冲） */
 void HAL_TIM_PeriodElapsedHalfCpltCallback(TIM_HandleTypeDef *htim);
-/* 输出比较延迟结束回调 */
+/* 输出比较延迟结束回调函数 */
 void HAL_TIM_OC_DelayElapsedCallback(TIM_HandleTypeDef *htim);
-/* 输入捕获回调 */
+/* 输入捕获回调函数 */
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim);
-/* 输入捕获半完成回调(DMA双缓冲) */
+/* 输入捕获半完成回调函数 */
 void HAL_TIM_IC_CaptureHalfCpltCallback(TIM_HandleTypeDef *htim);
-/* PWM脉冲结束回调 */
+/* PWM脉冲结束回调函数 */
 void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim);
-/* PWM脉冲半完成回调(DMA双缓冲) */
+/* PWM脉冲半完成回调函数 */
 void HAL_TIM_PWM_PulseFinishedHalfCpltCallback(TIM_HandleTypeDef *htim);
-/* 触发回调 */
+/* 触发回调函数 */
 void HAL_TIM_TriggerCallback(TIM_HandleTypeDef *htim);
-/* 触发半完成回调(DMA双缓冲) */
+/* 触发半完成回调函数 */
 void HAL_TIM_TriggerHalfCpltCallback(TIM_HandleTypeDef *htim);
-/* 错误回调 */
+/* 错误回调函数 */
 void HAL_TIM_ErrorCallback(TIM_HandleTypeDef *htim);
 
 /* 回调函数注册/注销函数  ***********************************/
@@ -556,7 +554,7 @@ HAL_TIM_StateTypeDef HAL_TIM_OnePulse_GetState(const TIM_HandleTypeDef *htim);
 HAL_TIM_StateTypeDef HAL_TIM_Encoder_GetState(const TIM_HandleTypeDef *htim);
 
 /* 外设通道状态函数  ************************************************/
-/* 获取当前活动通道 */
+/* 获取活动通道 */
 HAL_TIM_ActiveChannel HAL_TIM_GetActiveChannel(const TIM_HandleTypeDef *htim);
 /* 获取通道状态 */
 HAL_TIM_ChannelStateTypeDef HAL_TIM_GetChannelState(const TIM_HandleTypeDef *htim,  uint32_t Channel);
