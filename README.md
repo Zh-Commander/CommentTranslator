@@ -8,6 +8,7 @@
 2. 对大文件按安全边界拆分到 `temp/code_split/`
 3. 调用大模型把英文注释翻译/补充为中文，输出到 `temp/code_split_output/`
 4. 将拆分文件重新合并到 `code_output/`
+5. 可选：对合并结果执行反斜杠注释修复，处理宏续行中 `\ /* 注释 */ \` 这类位置异常的问题
 
 项目当前主要面向 STM32 HAL 库源码注释中文化，提示词也默认按“嵌入式初学者可读”来生成注释。
 
@@ -24,6 +25,7 @@ flowchart TD
     F --> G[输出到 temp/code_split_output/]
     G --> H[合并拆分后的结果]
     H --> I[输出到 code_output/]
+    I --> J[可选：修复反斜杠注释位置]
 ```
 
 如果当前 Markdown 阅读器不支持 Mermaid，可查看下面这张图片：
@@ -36,6 +38,7 @@ flowchart TD
 - `translate_comments.py`：调用大模型翻译注释
 - `split_c_file.py`：按空行/安全边界拆分大文件
 - `merge_split_output.py`：合并拆分后的翻译结果
+- `fix_backslash_before_comment.py`：修复宏续行中反斜杠与块注释位置错误的问题，可单独运行，也可作为主流程的可选后处理
 - `config.json`：运行配置
 - `system_prompt.txt`：模型系统提示词
 - `code_input/`：待处理源码输入目录
@@ -69,7 +72,8 @@ pip install openai tqdm
   "temperature": 0.2,
   "top_p": 1,
   "timeout": 700,
-  "max_workers": 3,
+  "isthink": false,
+  "max_workers": 20,
   "input_dir": "code_input",
   "output_dir": "code_output",
   "split_dir": "temp/code_split",
@@ -79,7 +83,8 @@ pip install openai tqdm
   "Large_file_split_threshold": 20000,
   "split_max_token": 20000,
   "split_min_token": 10000,
-  "encoding": "utf-8"
+  "encoding": "utf-8",
+  "isFixBackSlash": true
 }
 ```
 
@@ -118,18 +123,25 @@ pip install openai tqdm
   - 当前值：`1`
 
 - `timeout`
-  
+
   - 含义：单次请求超时时间。
   - 作用：避免模型响应过慢时一直卡住。
   - 单位：秒。
   - 当前值：`700`
 
+- `isthink`
+
+  - 含义：是否启用模型的思考模式开关。
+  - 作用：传递给模型接口，控制是否使用额外思考能力。
+  - 可选值：`true` / `false`
+  - 当前值：`false`
+
 - `max_workers`
-  
+
   - 含义：并发处理文件数量。
   - 作用：翻译阶段会使用线程池并发调用模型接口。
   - 建议：根据接口限速和机器性能调整，过大可能触发限流。
-  - 当前值：`3`
+  - 当前值：`20`
 
 - `input_dir`
   
@@ -189,11 +201,19 @@ pip install openai tqdm
   - 当前值：`10000`
 
 - `encoding`
-  
+
   - 含义：读取和写入源文件时使用的编码。
   - 作用：用于拆分、翻译和保存文件。
   - 建议：常见情况下使用 `utf-8`，如果源码不是 UTF-8，需要改成对应编码。
   - 当前值：`utf-8`
+
+- `isFixBackSlash`
+
+  - 含义：是否在合并完成后执行反斜杠注释修复。
+  - 作用：用于处理宏续行里 `\ /* 注释 */ \`、`\ /* 注释 */` 这类反斜杠位置异常的情况，修复目标目录是 `code_output/`。
+  - 可选值：`true` / `false`
+  - 建议：如果翻译后的头文件里出现宏续行反斜杠跑到块注释前面，可开启。
+  - 当前值：`true`
 
 ### 配置建议
 
@@ -240,7 +260,25 @@ $env:OPENAI_KEY="your_api_key"
 
 将需要处理的源码放到 `code_input/` 目录下，保留原有目录结构即可。
 
-### 3. 执行
+### 3. 可选：开启合并后修复
+
+如果翻译后的宏定义出现反斜杠跑到块注释前面的情况，可以在 `config.json` 中开启：
+
+```json
+{
+  "isFixBackSlash": true
+}
+```
+
+开启后，`main.py` 会在合并完成后遍历 `code_output/` 下匹配扩展名的文件，并调用 `fix_backslash_before_comment.py` 中的修复逻辑。
+
+如果你只想单独修复某一个文件，也可以直接运行：
+
+```bash
+python fix_backslash_before_comment.py code_output/Inc/stm32f1xx_hal_tim.h
+```
+
+### 4. 执行
 
 直接运行：
 
