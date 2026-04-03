@@ -10,13 +10,14 @@ class FixCommentError(Exception):
 
 
 
-def _find_block_comment_start(line: str, end_index: int) -> int | None:
+def _find_first_block_comment(line: str) -> tuple[int, int] | None:
     in_string: str | None = None
     i = 0
+    comment_start: int | None = None
 
-    while i <= end_index:
+    while i < len(line):
         ch = line[i]
-        nxt = line[i + 1] if i + 1 <= end_index else ""
+        nxt = line[i + 1] if i + 1 < len(line) else ""
 
         if in_string is not None:
             if ch == "\\":
@@ -33,32 +34,31 @@ def _find_block_comment_start(line: str, end_index: int) -> int | None:
             continue
 
         if ch == "/" and nxt == "*":
-            return i
+            comment_start = i
+            i += 2
+            break
 
+        if ch == "/" and nxt == "/":
+            return None
+
+        i += 1
+
+    if comment_start is None:
+        return None
+
+    while i < len(line):
+        ch = line[i]
+        nxt = line[i + 1] if i + 1 < len(line) else ""
+        if ch == "*" and nxt == "/":
+            return comment_start, i + 1
         i += 1
 
     return None
 
 
 
-def _find_trailing_block_comment(line: str) -> tuple[int, int] | None:
-    end = len(line) - 1
-    while end >= 0 and line[end] in " \t\r\n":
-        end -= 1
-
-    if end < 1 or line[end - 1] != "*" or line[end] != "/":
-        return None
-
-    start = _find_block_comment_start(line, end)
-    if start is None:
-        return None
-
-    return start, end
-
-
-
 def _fix_line(line: str) -> tuple[str, bool]:
-    comment_range = _find_trailing_block_comment(line)
+    comment_range = _find_first_block_comment(line)
     if comment_range is None:
         return line, False
 
@@ -68,16 +68,32 @@ def _fix_line(line: str) -> tuple[str, bool]:
     while prefix_end >= 0 and line[prefix_end] in " \t":
         prefix_end -= 1
 
-    if prefix_end < 0 or line[prefix_end] != "\\":
-        return line, False
+    slash_end = prefix_end
+    while prefix_end >= 0 and line[prefix_end] == "\\":
+        prefix_end -= 1
+    slash_start = prefix_end + 1
+    slash_count = slash_end - slash_start + 1
 
     newline_start = len(line)
     while newline_start > 0 and line[newline_start - 1] in "\r\n":
         newline_start -= 1
 
+    suffix_start = comment_end + 1
+    while suffix_start < newline_start and line[suffix_start] in " \t":
+        suffix_start += 1
+
+    has_suffix_backslash = suffix_start < newline_start and line[suffix_start] == "\\"
+
+    if slash_count <= 0:
+        return line, False
+
+    if has_suffix_backslash:
+        fixed_line = line[:slash_start] + line[slash_end + 1 :]
+        return fixed_line, True
+
     fixed_line = (
-        line[:prefix_end]
-        + line[prefix_end + 1 : newline_start]
+        line[:slash_start]
+        + line[slash_end + 1 : newline_start]
         + "\\"
         + line[newline_start:]
     )

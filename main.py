@@ -2,6 +2,7 @@ import shutil
 import sys
 from pathlib import Path
 
+from fix_backslash_before_comment import FixCommentError, fix_file
 from merge_split_output import run as run_merge
 from split_c_file import split_c_file
 from translate_comments import load_config, run_translation
@@ -90,6 +91,35 @@ def split_inputs(config: dict) -> int:
 
 
 
+def fix_output_files(config: dict) -> int:
+    if not config.get("isFixBackSlash", False):
+        return 0
+
+    output_dir = resolve_dir(config["output_dir"])
+    encoding = config.get("encoding", "utf-8")
+    extensions = {ext.lower() for ext in config["file_extensions"]}
+    files = collect_input_files(output_dir, extensions)
+    fixed_total = 0
+    fixed_file_count = 0
+
+    for file_path in files:
+        try:
+            fixed_lines = fix_file(file_path, encoding=encoding)
+        except FixCommentError as exc:
+            raise SystemExit(f"Failed to fix backslash comments in {file_path}: {exc}") from exc
+
+        if fixed_lines <= 0:
+            continue
+
+        fixed_total += fixed_lines
+        fixed_file_count += 1
+        print(f"Fixed {fixed_lines} line(s): {file_path}")
+
+    print(f"Fixed {fixed_total} line(s) in {fixed_file_count} file(s).")
+    return fixed_total
+
+
+
 def main() -> int:
     config = load_config()
     validate_config(config)
@@ -105,6 +135,7 @@ def main() -> int:
         output_dir=resolve_dir(config["output_dir"]),
         config=config,
     )
+    fix_output_files(config)
     return 0
 
 

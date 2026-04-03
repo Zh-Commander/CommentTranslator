@@ -5,7 +5,7 @@
   "temperature": 0.2,
   "top_p": 1,
   "timeout": 700,
-  "isthink": true,
+  "isthink": false,
   "max_workers": 20,
   "input_dir": "code_input",
   "output_dir": "code_output",
@@ -21,4 +21,5 @@
   "split_max_token": 20000,
   "split_min_token": 10000,
   "encoding": "utf-8",
+  "isFixBackSlash": true,
 }
