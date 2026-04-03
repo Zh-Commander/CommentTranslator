@@ -56,6 +56,7 @@ class Translator:
         self.temperature = config.get("temperature", 0)
         self.top_p = config.get("top_p", 1)
         self.timeout = config.get("timeout", 600)
+        self.isthink = bool(config.get("isthink", False))
 
     @staticmethod
     def extract_c_code_block(text: str) -> str:
@@ -91,16 +92,25 @@ class Translator:
     def translate_file(self, input_file: Path, system_prompt: str) -> tuple[Path, bool, str]:
         user_prompt = input_file.read_text(encoding="utf-8", errors="ignore")
 
-        response = self.client.chat.completions.create(
-            model=self.model,
-            messages=[
+        request_kwargs = {
+            "model": self.model,
+            "messages": [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},
             ],
-            temperature=self.temperature,
-            top_p=self.top_p,
-            timeout=self.timeout,
-        )
+            "temperature": self.temperature,
+            "top_p": self.top_p,
+            "timeout": self.timeout,
+        }
+
+        if self.isthink:
+            request_kwargs["extra_body"] = {
+                "thinking": {
+                    "type": "enabled"
+                }
+            }
+
+        response = self.client.chat.completions.create(**request_kwargs)
 
         output_text = response.choices[0].message.content or ""
         output_text = self.extract_c_code_block(output_text)

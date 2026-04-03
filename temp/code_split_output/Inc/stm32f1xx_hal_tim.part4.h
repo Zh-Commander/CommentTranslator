@@ -1,26 +1,26 @@
 /**
-  * @brief  在运行时设置TIM自动重装载寄存器值，无需再次调用初始化函数。
-  * @param  __HANDLE__: TIM句柄。
-  * @param  __AUTORELOAD__: 指定计数器寄存器的新值。
+  * @brief  在运行时设置TIM自动重装载寄存器值，无需重新调用初始化函数。
+  * @param  __HANDLE__ TIM句柄。
+  * @param  __AUTORELOAD__ 指定计数器寄存器的新值（即自动重装载值ARR）。
   * @retval 无
   */
 #define __HAL_TIM_SET_AUTORELOAD(__HANDLE__, __AUTORELOAD__) \
   do{                                                    \
-    (__HANDLE__)->Instance->ARR = (__AUTORELOAD__);  \ /* 将新的自动重装载值写入ARR寄存器 */
+    (__HANDLE__)->Instance->ARR = (__AUTORELOAD__);  \ /* 设置ARR寄存器，决定计数周期 */
     (__HANDLE__)->Init.Period = (__AUTORELOAD__);    \ /* 同步更新句柄中的初始化结构体参数 */
   } while(0)
 
 /**
   * @brief  在运行时获取TIM自动重装载寄存器值。
-  * @param  __HANDLE__: TIM句柄。
+  * @param  __HANDLE__ TIM句柄。
   * @retval 16位或32位的定时器自动重装载寄存器值(TIMx_ARR)
   */
 #define __HAL_TIM_GET_AUTORELOAD(__HANDLE__)  ((__HANDLE__)->Instance->ARR)
 
 /**
-  * @brief  在运行时设置TIM时钟分频值，无需再次调用初始化函数。
-  * @param  __HANDLE__: TIM句柄。
-  * @param  __CKD__: 指定时钟分频值。
+  * @brief  在运行时设置TIM时钟分频值，无需重新调用初始化函数。
+  * @param  __HANDLE__ TIM句柄。
+  * @param  __CKD__ 指定时钟分频值。
   *          该参数可以是以下值之一:
   *            @arg TIM_CLOCKDIVISION_DIV1: tDTS=tCK_INT (不分频)
   *            @arg TIM_CLOCKDIVISION_DIV2: tDTS=2*tCK_INT (2分频)
@@ -36,8 +36,8 @@
 
 /**
   * @brief  在运行时获取TIM时钟分频值。
-  * @param  __HANDLE__: TIM句柄。
-  * @retval 时钟分频值，可以是以下值之一:
+  * @param  __HANDLE__ TIM句柄。
+  * @retval 时钟分频值可以是以下值之一:
   *            @arg TIM_CLOCKDIVISION_DIV1: tDTS=tCK_INT
   *            @arg TIM_CLOCKDIVISION_DIV2: tDTS=2*tCK_INT
   *            @arg TIM_CLOCKDIVISION_DIV4: tDTS=4*tCK_INT
@@ -45,15 +45,15 @@
 #define __HAL_TIM_GET_CLOCKDIVISION(__HANDLE__)  ((__HANDLE__)->Instance->CR1 & TIM_CR1_CKD)
 
 /**
-  * @brief  在运行时设置TIM输入捕获预分频值，无需再次调用HAL_TIM_IC_ConfigChannel()函数。
-  * @param  __HANDLE__: TIM句柄。
-  * @param  __CHANNEL__: 待配置的TIM通道。
+  * @brief  在运行时设置TIM输入捕获预分频值，无需重新调用HAL_TIM_IC_ConfigChannel()函数。
+  * @param  __HANDLE__ TIM句柄。
+  * @param  __CHANNEL__ 待配置的TIM通道。
   *          该参数可以是以下值之一:
   *            @arg TIM_CHANNEL_1: 选择TIM通道1
   *            @arg TIM_CHANNEL_2: 选择TIM通道2
   *            @arg TIM_CHANNEL_3: 选择TIM通道3
   *            @arg TIM_CHANNEL_4: 选择TIM通道4
-  * @param  __ICPSC__: 指定输入捕获预分频新值。
+  * @param  __ICPSC__ 指定输入捕获预分频新值。
   *          该参数可以是以下值之一:
   *            @arg TIM_ICPSC_DIV1: 无预分频
   *            @arg TIM_ICPSC_DIV2: 每2个事件捕获一次
@@ -63,70 +63,70 @@
   */
 #define __HAL_TIM_SET_ICPRESCALER(__HANDLE__, __CHANNEL__, __ICPSC__) \
   do{                                                    \
-    TIM_RESET_ICPRESCALERVALUE((__HANDLE__), (__CHANNEL__));  \ /* 复位指定通道的输入捕获预分频值 */
-    TIM_SET_ICPRESCALERVALUE((__HANDLE__), (__CHANNEL__), (__ICPSC__)); \ /* 设置指定通道的输入捕获预分频值 */
+    TIM_RESET_ICPRESCALERVALUE((__HANDLE__), (__CHANNEL__));  \ /* 复位输入捕获预分频值 */
+    TIM_SET_ICPRESCALERVALUE((__HANDLE__), (__CHANNEL__), (__ICPSC__)); \ /* 设置新的输入捕获预分频值 */
   } while(0)
 
 /**
   * @brief  在运行时获取TIM输入捕获预分频值。
-  * @param  __HANDLE__: TIM句柄。
-  * @param  __CHANNEL__: 待配置的TIM通道。
+  * @param  __HANDLE__ TIM句柄。
+  * @param  __CHANNEL__ 待配置的TIM通道。
   *          该参数可以是以下值之一:
   *            @arg TIM_CHANNEL_1: 获取输入捕获1预分频值
   *            @arg TIM_CHANNEL_2: 获取输入捕获2预分频值
   *            @arg TIM_CHANNEL_3: 获取输入捕获3预分频值
   *            @arg TIM_CHANNEL_4: 获取输入捕获4预分频值
-  * @retval 输入捕获预分频值，可以是以下值之一:
+  * @retval 输入捕获预分频值可以是以下值之一:
   *            @arg TIM_ICPSC_DIV1: 无预分频
   *            @arg TIM_ICPSC_DIV2: 每2个事件捕获一次
   *            @arg TIM_ICPSC_DIV4: 每4个事件捕获一次
   *            @arg TIM_ICPSC_DIV8: 每8个事件捕获一次
   */
 #define __HAL_TIM_GET_ICPRESCALER(__HANDLE__, __CHANNEL__)  \
-  (((__CHANNEL__) == TIM_CHANNEL_1) ? ((__HANDLE__)->Instance->CCMR1 & TIM_CCMR1_IC1PSC) :\ /* 如果是通道1，读取CCMR1的IC1PSC位 */
-   ((__CHANNEL__) == TIM_CHANNEL_2) ? (((__HANDLE__)->Instance->CCMR1 & TIM_CCMR1_IC2PSC) >> 8U) :\ /* 如果是通道2，读取CCMR1的IC2PSC位并右移8位 */
-   ((__CHANNEL__) == TIM_CHANNEL_3) ? ((__HANDLE__)->Instance->CCMR2 & TIM_CCMR2_IC3PSC) :\ /* 如果是通道3，读取CCMR2的IC3PSC位 */
-   (((__HANDLE__)->Instance->CCMR2 & TIM_CCMR2_IC4PSC)) >> 8U) /* 如果是通道4，读取CCMR2的IC4PSC位并右移8位 */
+  (((__CHANNEL__) == TIM_CHANNEL_1) ? ((__HANDLE__)->Instance->CCMR1 & TIM_CCMR1_IC1PSC) :\ /* 通道1，读取CCMR1的IC1PSC位 */
+   ((__CHANNEL__) == TIM_CHANNEL_2) ? (((__HANDLE__)->Instance->CCMR1 & TIM_CCMR1_IC2PSC) >> 8U) :\ /* 通道2，读取CCMR1的IC2PSC位并右移8位 */
+   ((__CHANNEL__) == TIM_CHANNEL_3) ? ((__HANDLE__)->Instance->CCMR2 & TIM_CCMR2_IC3PSC) :\ /* 通道3，读取CCMR2的IC3PSC位 */
+   (((__HANDLE__)->Instance->CCMR2 & TIM_CCMR2_IC4PSC)) >> 8U) /* 通道4，读取CCMR2的IC4PSC位并右移8位 */
 
 /**
-  * @brief  在运行时设置TIM捕获/比较寄存器值，无需再次调用ConfigChannel函数。
-  * @param  __HANDLE__: TIM句柄。
-  * @param  __CHANNEL__: 待配置的TIM通道。
+  * @brief  在运行时设置TIM捕获比较寄存器值，无需重新调用ConfigChannel函数。
+  * @param  __HANDLE__ TIM句柄。
+  * @param  __CHANNEL__ 待配置的TIM通道。
   *          该参数可以是以下值之一:
   *            @arg TIM_CHANNEL_1: 选择TIM通道1
   *            @arg TIM_CHANNEL_2: 选择TIM通道2
   *            @arg TIM_CHANNEL_3: 选择TIM通道3
   *            @arg TIM_CHANNEL_4: 选择TIM通道4
-  * @param  __COMPARE__: 指定捕获比较寄存器新值。
+  * @param  __COMPARE__ 指定捕获比较寄存器新值（即CCR值，常用于设置PWM占空比）。
   * @retval 无
   */
 #define __HAL_TIM_SET_COMPARE(__HANDLE__, __CHANNEL__, __COMPARE__) \
-  (((__CHANNEL__) == TIM_CHANNEL_1) ? ((__HANDLE__)->Instance->CCR1 = (__COMPARE__)) :\ /* 如果是通道1，设置CCR1寄存器 */
-   ((__CHANNEL__) == TIM_CHANNEL_2) ? ((__HANDLE__)->Instance->CCR2 = (__COMPARE__)) :\ /* 如果是通道2，设置CCR2寄存器 */
-   ((__CHANNEL__) == TIM_CHANNEL_3) ? ((__HANDLE__)->Instance->CCR3 = (__COMPARE__)) :\ /* 如果是通道3，设置CCR3寄存器 */
-   ((__HANDLE__)->Instance->CCR4 = (__COMPARE__))) /* 如果是通道4，设置CCR4寄存器 */
+  (((__CHANNEL__) == TIM_CHANNEL_1) ? ((__HANDLE__)->Instance->CCR1 = (__COMPARE__)) :\ /* 设置通道1的CCR寄存器 */
+   ((__CHANNEL__) == TIM_CHANNEL_2) ? ((__HANDLE__)->Instance->CCR2 = (__COMPARE__)) :\ /* 设置通道2的CCR寄存器 */
+   ((__CHANNEL__) == TIM_CHANNEL_3) ? ((__HANDLE__)->Instance->CCR3 = (__COMPARE__)) :\ /* 设置通道3的CCR寄存器 */
+   ((__HANDLE__)->Instance->CCR4 = (__COMPARE__))) /* 设置通道4的CCR寄存器 */
 
 /**
-  * @brief  在运行时获取TIM捕获/比较寄存器值。
-  * @param  __HANDLE__: TIM句柄。
-  * @param  __CHANNEL__: 与捕获比较寄存器关联的TIM通道
+  * @brief  在运行时获取TIM捕获比较寄存器值。
+  * @param  __HANDLE__ TIM句柄。
+  * @param  __CHANNEL__ 与捕获比较寄存器关联的TIM通道
   *          该参数可以是以下值之一:
   *            @arg TIM_CHANNEL_1: 获取捕获/比较1寄存器值
   *            @arg TIM_CHANNEL_2: 获取捕获/比较2寄存器值
   *            @arg TIM_CHANNEL_3: 获取捕获/比较3寄存器值
   *            @arg TIM_CHANNEL_4: 获取捕获/比较4寄存器值
-  * @retval 16位或32位的捕获/比较寄存器值(TIMx_CCRy)
+  * @retval 16位或32位的捕获/比较寄存器值 (TIMx_CCRy)
   */
 #define __HAL_TIM_GET_COMPARE(__HANDLE__, __CHANNEL__) \
-  (((__CHANNEL__) == TIM_CHANNEL_1) ? ((__HANDLE__)->Instance->CCR1) :\ /* 如果是通道1，读取CCR1寄存器 */
-   ((__CHANNEL__) == TIM_CHANNEL_2) ? ((__HANDLE__)->Instance->CCR2) :\ /* 如果是通道2，读取CCR2寄存器 */
-   ((__CHANNEL__) == TIM_CHANNEL_3) ? ((__HANDLE__)->Instance->CCR3) :\ /* 如果是通道3，读取CCR3寄存器 */
-   ((__HANDLE__)->Instance->CCR4)) /* 如果是通道4，读取CCR4寄存器 */
+  (((__CHANNEL__) == TIM_CHANNEL_1) ? ((__HANDLE__)->Instance->CCR1) :\ /* 获取通道1的CCR值 */
+   ((__CHANNEL__) == TIM_CHANNEL_2) ? ((__HANDLE__)->Instance->CCR2) :\ /* 获取通道2的CCR值 */
+   ((__CHANNEL__) == TIM_CHANNEL_3) ? ((__HANDLE__)->Instance->CCR3) :\ /* 获取通道3的CCR值 */
+   ((__HANDLE__)->Instance->CCR4)) /* 获取通道4的CCR值 */
 
 /**
-  * @brief  设置TIM输出比较预装载。
-  * @param  __HANDLE__: TIM句柄。
-  * @param  __CHANNEL__: 待配置的TIM通道。
+  * @brief  设置TIM输出比较预装载功能。
+  * @param  __HANDLE__ TIM句柄。
+  * @param  __CHANNEL__ 待配置的TIM通道。
   *          该参数可以是以下值之一:
   *            @arg TIM_CHANNEL_1: 选择TIM通道1
   *            @arg TIM_CHANNEL_2: 选择TIM通道2
@@ -141,9 +141,9 @@
    ((__HANDLE__)->Instance->CCMR2 |= TIM_CCMR2_OC4PE)) /* 通道4：使能CCR4预装载 */
 
 /**
-  * @brief  复位TIM输出比较预装载。
-  * @param  __HANDLE__: TIM句柄。
-  * @param  __CHANNEL__: 待配置的TIM通道。
+  * @brief  禁用TIM输出比较预装载功能。
+  * @param  __HANDLE__ TIM句柄。
+  * @param  __CHANNEL__ 待配置的TIM通道。
   *          该参数可以是以下值之一:
   *            @arg TIM_CHANNEL_1: 选择TIM通道1
   *            @arg TIM_CHANNEL_2: 选择TIM通道2
@@ -152,23 +152,23 @@
   * @retval 无
   */
 #define __HAL_TIM_DISABLE_OCxPRELOAD(__HANDLE__, __CHANNEL__)    \
-  (((__CHANNEL__) == TIM_CHANNEL_1) ? ((__HANDLE__)->Instance->CCMR1 &= ~TIM_CCMR1_OC1PE) :\ /* 通道1：禁能CCR1预装载 */
-   ((__CHANNEL__) == TIM_CHANNEL_2) ? ((__HANDLE__)->Instance->CCMR1 &= ~TIM_CCMR1_OC2PE) :\ /* 通道2：禁能CCR2预装载 */
-   ((__CHANNEL__) == TIM_CHANNEL_3) ? ((__HANDLE__)->Instance->CCMR2 &= ~TIM_CCMR2_OC3PE) :\ /* 通道3：禁能CCR3预装载 */
-   ((__HANDLE__)->Instance->CCMR2 &= ~TIM_CCMR2_OC4PE)) /* 通道4：禁能CCR4预装载 */
+  (((__CHANNEL__) == TIM_CHANNEL_1) ? ((__HANDLE__)->Instance->CCMR1 &= ~TIM_CCMR1_OC1PE) :\ /* 通道1：禁用CCR1预装载 */
+   ((__CHANNEL__) == TIM_CHANNEL_2) ? ((__HANDLE__)->Instance->CCMR1 &= ~TIM_CCMR1_OC2PE) :\ /* 通道2：禁用CCR2预装载 */
+   ((__CHANNEL__) == TIM_CHANNEL_3) ? ((__HANDLE__)->Instance->CCMR2 &= ~TIM_CCMR2_OC3PE) :\ /* 通道3：禁用CCR3预装载 */
+   ((__HANDLE__)->Instance->CCMR2 &= ~TIM_CCMR2_OC4PE)) /* 通道4：禁用CCR4预装载 */
 
 /**
   * @brief  使能指定通道的快速模式。
-  * @param  __HANDLE__: TIM句柄。
-  * @param  __CHANNEL__: 待配置的TIM通道。
+  * @param  __HANDLE__ TIM句柄。
+  * @param  __CHANNEL__ 待配置的TIM通道。
   *          该参数可以是以下值之一:
   *            @arg TIM_CHANNEL_1: 选择TIM通道1
   *            @arg TIM_CHANNEL_2: 选择TIM通道2
   *            @arg TIM_CHANNEL_3: 选择TIM通道3
   *            @arg TIM_CHANNEL_4: 选择TIM通道4
-  * @note  当快速模式使能时，触发输入上的有效边沿就像CCx输出上的比较匹配一样。
+  * @note  当快速模式使能时，触发输入上的有效边沿的作用类似于CCx输出上的比较匹配。
   *        采样触发输入和激活CCx输出的延迟减少到3个时钟周期。
-  * @note  快速模式仅在通道配置为PWM1或PWM2模式时起作用。
+  * @note  快速模式仅在通道配置为PWM1或PWM2模式时有效。
   * @retval 无
   */
 #define __HAL_TIM_ENABLE_OCxFAST(__HANDLE__, __CHANNEL__)    \
@@ -178,37 +178,37 @@
    ((__HANDLE__)->Instance->CCMR2 |= TIM_CCMR2_OC4FE)) /* 通道4：使能快速模式 */
 
 /**
-  * @brief  禁能指定通道的快速模式。
-  * @param  __HANDLE__: TIM句柄。
-  * @param  __CHANNEL__: 待配置的TIM通道。
+  * @brief  禁用指定通道的快速模式。
+  * @param  __HANDLE__ TIM句柄。
+  * @param  __CHANNEL__ 待配置的TIM通道。
   *          该参数可以是以下值之一:
   *            @arg TIM_CHANNEL_1: 选择TIM通道1
   *            @arg TIM_CHANNEL_2: 选择TIM通道2
   *            @arg TIM_CHANNEL_3: 选择TIM通道3
   *            @arg TIM_CHANNEL_4: 选择TIM通道4
-  * @note  当快速模式禁能时，即使触发开启，CCx输出也取决于计数器和CCRx值正常表现。
-  *        当触发输入上出现有效边沿时，激活CCx输出的最小延迟为5个时钟周期。
+  * @note  当快速模式禁用时，即使触发开启，CCx输出也根据计数器和CCRx值正常表现。
+  *        当触发输入上发生有效边沿时，激活CCx输出的最小延迟为5个时钟周期。
   * @retval 无
   */
 #define __HAL_TIM_DISABLE_OCxFAST(__HANDLE__, __CHANNEL__)    \
-  (((__CHANNEL__) == TIM_CHANNEL_1) ? ((__HANDLE__)->Instance->CCMR1 &= ~TIM_CCMR1_OC1FE) :\ /* 通道1：禁能快速模式 */
-   ((__CHANNEL__) == TIM_CHANNEL_2) ? ((__HANDLE__)->Instance->CCMR1 &= ~TIM_CCMR1_OC2FE) :\ /* 通道2：禁能快速模式 */
-   ((__CHANNEL__) == TIM_CHANNEL_3) ? ((__HANDLE__)->Instance->CCMR2 &= ~TIM_CCMR2_OC3FE) :\ /* 通道3：禁能快速模式 */
-   ((__HANDLE__)->Instance->CCMR2 &= ~TIM_CCMR2_OC4FE)) /* 通道4：禁能快速模式 */
+  (((__CHANNEL__) == TIM_CHANNEL_1) ? ((__HANDLE__)->Instance->CCMR1 &= ~TIM_CCMR1_OC1FE) :\ /* 通道1：禁用快速模式 */
+   ((__CHANNEL__) == TIM_CHANNEL_2) ? ((__HANDLE__)->Instance->CCMR1 &= ~TIM_CCMR1_OC2FE) :\ /* 通道2：禁用快速模式 */
+   ((__CHANNEL__) == TIM_CHANNEL_3) ? ((__HANDLE__)->Instance->CCMR2 &= ~TIM_CCMR2_OC3FE) :\ /* 通道3：禁用快速模式 */
+   ((__HANDLE__)->Instance->CCMR2 &= ~TIM_CCMR2_OC4FE)) /* 通道4：禁用快速模式 */
 
 /**
   * @brief  设置TIMx_CR1寄存器的更新请求源(URS)位。
-  * @param  __HANDLE__: TIM句柄。
-  * @note  当TIMx_CR1寄存器的URS位置1时，只有计数器溢出/下溢才生成更新中断或DMA请求(如果使能)。
+  * @param  __HANDLE__ TIM句柄。
+  * @note  当TIMx_CR1寄存器的URS位置位时，只有计数器溢出/下溢才生成更新中断或DMA请求（如果使能）。
   * @retval 无
   */
 #define __HAL_TIM_URS_ENABLE(__HANDLE__)  ((__HANDLE__)->Instance->CR1|= TIM_CR1_URS)
 
 /**
   * @brief  复位TIMx_CR1寄存器的更新请求源(URS)位。
-  * @param  __HANDLE__: TIM句柄。
-  * @note  当TIMx_CR1寄存器的URS位复位时，以下任何事件都会生成更新中断或DMA请求(如果使能):
-  *           _ 计数器溢出下溢
+  * @param  __HANDLE__ TIM句柄。
+  * @note  当TIMx_CR1寄存器的URS位复位时，以下任何事件都会生成更新中断或DMA请求（如果使能）:
+  *           _ 计数器溢出/下溢
   *           _ 设置UG位
   *           _ 通过从模式控制器生成的更新
   * @retval 无
@@ -217,31 +217,31 @@
 
 /**
   * @brief  在运行时设置TIM捕获x输入极性。
-  * @param  __HANDLE__: TIM句柄。
-  * @param  __CHANNEL__: 待配置的TIM通道。
+  * @param  __HANDLE__ TIM句柄。
+  * @param  __CHANNEL__ 待配置的TIM通道。
   *          该参数可以是以下值之一:
   *            @arg TIM_CHANNEL_1: 选择TIM通道1
   *            @arg TIM_CHANNEL_2: 选择TIM通道2
   *            @arg TIM_CHANNEL_3: 选择TIM通道3
   *            @arg TIM_CHANNEL_4: 选择TIM通道4
-  * @param  __POLARITY__: TIx源的极性
+  * @param  __POLARITY__ TIx源的极性
   *            @arg TIM_INPUTCHANNELPOLARITY_RISING: 上升沿
   *            @arg TIM_INPUTCHANNELPOLARITY_FALLING: 下降沿
-  *            @arg TIM_INPUTCHANNELPOLARITY_BOTHEDGE: 双边沿(上升沿和下降沿)
+  *            @arg TIM_INPUTCHANNELPOLARITY_BOTHEDGE: 双边沿（上升沿和下降沿）
   * @retval 无
   */
 #define __HAL_TIM_SET_CAPTUREPOLARITY(__HANDLE__, __CHANNEL__, __POLARITY__)    \
   do{                                                                     \
-    TIM_RESET_CAPTUREPOLARITY((__HANDLE__), (__CHANNEL__));               \ /* 复位捕获极性设置 */
+    TIM_RESET_CAPTUREPOLARITY((__HANDLE__), (__CHANNEL__));               \ /* 复位捕获极性 */
     TIM_SET_CAPTUREPOLARITY((__HANDLE__), (__CHANNEL__), (__POLARITY__)); \ /* 设置新的捕获极性 */
   }while(0)
 
 /** @brief  选择捕获/比较DMA请求源。
-  * @param  __HANDLE__: 指定TIM句柄。
-  * @param  __CCDMA__: 指定捕获/比较DMA请求源
+  * @param  __HANDLE__ 指定TIM句柄。
+  * @param  __CCDMA__ 指定捕获/比较DMA请求源
   *          该参数可以是以下值之一:
-  *            @arg TIM_CCDMAREQUEST_CC: 在捕获/比较事件上生成CCx DMA请求
-  *            @arg TIM_CCDMAREQUEST_UPDATE: 在更新事件上生成CCx DMA请求
+  *            @arg TIM_CCDMAREQUEST_CC: 捕获/比较事件生成CCx DMA请求
+  *            @arg TIM_CCDMAREQUEST_UPDATE: 更新事件生成CCx DMA请求
   * @retval 无
   */
 #define __HAL_TIM_SELECT_CCDMAREQUEST(__HANDLE__, __CCDMA__)    \
@@ -256,10 +256,10 @@
 /** @defgroup TIM_Private_Constants TIM 私有常量
   * @{
   */
-/* 只有当所有CCx和CCxN通道都被禁能时，定时器实例的计数器才会被禁能 */
-/* 定义CCER寄存器中使能位的掩码，用于输出通道 */
+/* 只有当所有CCx和CCxN通道都被禁用时，定时器实例的计数器才会被禁用 */
+/* 定义CCER寄存器中CCxE（输出使能）位的掩码，用于通道1-4 */
 #define TIM_CCER_CCxE_MASK  ((uint32_t)(TIM_CCER_CC1E | TIM_CCER_CC2E | TIM_CCER_CC3E | TIM_CCER_CC4E))
-/* 定义CCER寄存器中互补输出使能位的掩码 */
+/* 定义CCER寄存器中CCxNE（互补输出使能）位的掩码，用于通道1-3 */
 #define TIM_CCER_CCxNE_MASK ((uint32_t)(TIM_CCER_CC1NE | TIM_CCER_CC2NE | TIM_CCER_CC3NE))
 /**
   * @}
@@ -270,11 +270,11 @@
 /** @defgroup TIM_Private_Macros TIM 私有宏
   * @{
   */
-/* 检查清除输入源是否合法 */
+/* 检查清除输入源是否有效 */
 #define IS_TIM_CLEARINPUT_SOURCE(__MODE__)  (((__MODE__) == TIM_CLEARINPUTSOURCE_NONE)      || \
                                              ((__MODE__) == TIM_CLEARINPUTSOURCE_ETR))
 
-/* 检查DMA基地址是否合法 */
+/* 检查DMA基地址是否有效 */
 #define IS_TIM_DMA_BASE(__BASE__) (((__BASE__) == TIM_DMABASE_CR1)   || \
                                    ((__BASE__) == TIM_DMABASE_CR2)   || \
                                    ((__BASE__) == TIM_DMABASE_SMCR)  || \
@@ -294,92 +294,92 @@
                                    ((__BASE__) == TIM_DMABASE_CCR4)  || \
                                    ((__BASE__) == TIM_DMABASE_BDTR))
 
-/* 检查事件源是否合法 */
+/* 检查事件源是否有效：确保高24位为0且低8位不全为0 */
 #define IS_TIM_EVENT_SOURCE(__SOURCE__) ((((__SOURCE__) & 0xFFFFFF00U) == 0x00000000U) && ((__SOURCE__) != 0x00000000U))
 
-/* 检查计数器模式是否合法 */
+/* 检查计数器模式是否有效 */
 #define IS_TIM_COUNTER_MODE(__MODE__)      (((__MODE__) == TIM_COUNTERMODE_UP)              || \
                                             ((__MODE__) == TIM_COUNTERMODE_DOWN)            || \
                                             ((__MODE__) == TIM_COUNTERMODE_CENTERALIGNED1)  || \
                                             ((__MODE__) == TIM_COUNTERMODE_CENTERALIGNED2)  || \
                                             ((__MODE__) == TIM_COUNTERMODE_CENTERALIGNED3))
 
-/* 检查时钟分频是否合法 */
+/* 检查时钟分频是否有效 */
 #define IS_TIM_CLOCKDIVISION_DIV(__DIV__)  (((__DIV__) == TIM_CLOCKDIVISION_DIV1) || \
                                             ((__DIV__) == TIM_CLOCKDIVISION_DIV2) || \
                                             ((__DIV__) == TIM_CLOCKDIVISION_DIV4))
 
-/* 检查自动重装载预装载是否合法 */
+/* 检查自动重装载预装载是否有效 */
 #define IS_TIM_AUTORELOAD_PRELOAD(PRELOAD) (((PRELOAD) == TIM_AUTORELOAD_PRELOAD_DISABLE) || \
                                             ((PRELOAD) == TIM_AUTORELOAD_PRELOAD_ENABLE))
 
-/* 检查快速模式状态是否合法 */
+/* 检查快速模式状态是否有效 */
 #define IS_TIM_FAST_STATE(__STATE__)       (((__STATE__) == TIM_OCFAST_DISABLE) || \
                                             ((__STATE__) == TIM_OCFAST_ENABLE))
 
-/* 检查输出比较极性是否合法 */
+/* 检查输出比较极性是否有效 */
 #define IS_TIM_OC_POLARITY(__POLARITY__)   (((__POLARITY__) == TIM_OCPOLARITY_HIGH) || \
                                             ((__POLARITY__) == TIM_OCPOLARITY_LOW))
 
-/* 检查互补输出比较极性是否合法 */
+/* 检查互补输出比较极性是否有效 */
 #define IS_TIM_OCN_POLARITY(__POLARITY__)  (((__POLARITY__) == TIM_OCNPOLARITY_HIGH) || \
                                             ((__POLARITY__) == TIM_OCNPOLARITY_LOW))
 
-/* 检查输出比较空闲状态是否合法 */
+/* 检查输出空闲状态是否有效 */
 #define IS_TIM_OCIDLE_STATE(__STATE__)     (((__STATE__) == TIM_OCIDLESTATE_SET) || \
                                             ((__STATE__) == TIM_OCIDLESTATE_RESET))
 
-/* 检查互补输出比较空闲状态是否合法 */
+/* 检查互补输出空闲状态是否有效 */
 #define IS_TIM_OCNIDLE_STATE(__STATE__)    (((__STATE__) == TIM_OCNIDLESTATE_SET) || \
                                             ((__STATE__) == TIM_OCNIDLESTATE_RESET))
 
-/* 检查编码器输入极性是否合法 */
+/* 检查编码器输入极性是否有效 */
 #define IS_TIM_ENCODERINPUT_POLARITY(__POLARITY__)   (((__POLARITY__) == TIM_ENCODERINPUTPOLARITY_RISING)   || \
                                                       ((__POLARITY__) == TIM_ENCODERINPUTPOLARITY_FALLING))
 
-/* 检查输入捕获极性是否合法 */
+/* 检查输入捕获极性是否有效 */
 #define IS_TIM_IC_POLARITY(__POLARITY__)   (((__POLARITY__) == TIM_ICPOLARITY_RISING)   || \
                                             ((__POLARITY__) == TIM_ICPOLARITY_FALLING)  || \
                                             ((__POLARITY__) == TIM_ICPOLARITY_BOTHEDGE))
 
-/* 检查输入捕获选择是否合法 */
+/* 检查输入捕获选择是否有效 */
 #define IS_TIM_IC_SELECTION(__SELECTION__) (((__SELECTION__) == TIM_ICSELECTION_DIRECTTI) || \
                                             ((__SELECTION__) == TIM_ICSELECTION_INDIRECTTI) || \
                                             ((__SELECTION__) == TIM_ICSELECTION_TRC))
 
-/* 检查输入捕获预分频是否合法 */
+/* 检查输入捕获预分频是否有效 */
 #define IS_TIM_IC_PRESCALER(__PRESCALER__) (((__PRESCALER__) == TIM_ICPSC_DIV1) || \
                                             ((__PRESCALER__) == TIM_ICPSC_DIV2) || \
                                             ((__PRESCALER__) == TIM_ICPSC_DIV4) || \
                                             ((__PRESCALER__) == TIM_ICPSC_DIV8))
 
-/* 检查单脉冲模式是否合法 */
+/* 检查单脉冲模式是否有效 */
 #define IS_TIM_OPM_MODE(__MODE__)          (((__MODE__) == TIM_OPMODE_SINGLE) || \
                                             ((__MODE__) == TIM_OPMODE_REPETITIVE))
 
-/* 检查编码器模式是否合法 */
+/* 检查编码器模式是否有效 */
 #define IS_TIM_ENCODER_MODE(__MODE__)      (((__MODE__) == TIM_ENCODERMODE_TI1) || \
                                             ((__MODE__) == TIM_ENCODERMODE_TI2) || \
                                             ((__MODE__) == TIM_ENCODERMODE_TI12))
 
-/* 检查DMA源是否合法 */
+/* 检查DMA源是否有效：确保相关位为0且源不为0 */
 #define IS_TIM_DMA_SOURCE(__SOURCE__) ((((__SOURCE__) & 0xFFFF80FFU) == 0x00000000U) && ((__SOURCE__) != 0x00000000U))
 
-/* 检查通道是否合法 */
+/* 检查通道是否有效 */
 #define IS_TIM_CHANNELS(__CHANNEL__)       (((__CHANNEL__) == TIM_CHANNEL_1) || \
                                             ((__CHANNEL__) == TIM_CHANNEL_2) || \
                                             ((__CHANNEL__) == TIM_CHANNEL_3) || \
                                             ((__CHANNEL__) == TIM_CHANNEL_4) || \
                                             ((__CHANNEL__) == TIM_CHANNEL_ALL))
 
-/* 检查单脉冲模式通道是否合法 */
+/* 检查单脉冲模式通道是否有效 */
 #define IS_TIM_OPM_CHANNELS(__CHANNEL__)   (((__CHANNEL__) == TIM_CHANNEL_1) || \
                                             ((__CHANNEL__) == TIM_CHANNEL_2))
 
-/* 检查周期值是否合法 */
+/* 检查周期值是否有效（0 < Period <= 0xFFFF） */
 #define IS_TIM_PERIOD(__PERIOD__)      (((__PERIOD__) > 0U) && ((__PERIOD__) <= 0xFFFFU))
 
-/* 检查互补通道是否合法 */
+/* 检查互补通道是否有效 */
 #define IS_TIM_COMPLEMENTARY_CHANNELS(__CHANNEL__) (((__CHANNEL__) == TIM_CHANNEL_1) || \
                                                     ((__CHANNEL__) == TIM_CHANNEL_2) || \
                                                     ((__CHANNEL__) == TIM_CHANNEL_3))
