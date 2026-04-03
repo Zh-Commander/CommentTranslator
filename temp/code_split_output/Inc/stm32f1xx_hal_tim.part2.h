@@ -1,9 +1,9 @@
 /** @defgroup TIM_Commutation_Source  TIM Commutation Source
   * @{
   */
-/* 当捕获/比较控制位被预装载时，可通过设置COMG位或触发输入上升沿来更新 */
+/* 当捕获/比较控制位被预装载时，它们可以通过设置COMG位或在触发输入上出现上升沿时更新 */
 #define TIM_COMMUTATION_TRGI              TIM_CR2_CCUS                          
-/* 当捕获/比较控制位被预装载时，仅通过设置COMG位来更新 */
+/* 当捕获/比较控制位被预装载时，它们可以通过设置COMG位来更新 */
 #define TIM_COMMUTATION_SOFTWARE          0x00000000U                           
 /**
   * @}
@@ -33,9 +33,9 @@
 /** @defgroup TIM_CC_DMA_Request CCx DMA request selection
   * @{
   */
-/* 当发生捕获或比较匹配事件时发送CCx DMA请求 */
+/* 当捕获或比较匹配事件发生时发送CCx DMA请求 */
 #define TIM_CCDMAREQUEST_CC                 0x00000000U                         
-/* 当发生更新事件时发送CCx DMA请求 */
+/* 当更新事件发生时发送CCx DMA请求 */
 #define TIM_CCDMAREQUEST_UPDATE             TIM_CR2_CCDS                        
 /**
   * @}
@@ -119,15 +119,15 @@
 /** @defgroup TIM_Clock_Polarity TIM Clock Polarity
   * @{
   */
-/* ETRx时钟源的反极性 */
+/* ETRx时钟源的极性：反相 */
 #define TIM_CLOCKPOLARITY_INVERTED           TIM_ETRPOLARITY_INVERTED           
-/* ETRx时钟源的非反极性 */
+/* ETRx时钟源的极性：非反相 */
 #define TIM_CLOCKPOLARITY_NONINVERTED        TIM_ETRPOLARITY_NONINVERTED        
-/* TIx时钟源的上升沿极性 */
+/* TIx时钟源的极性：上升沿 */
 #define TIM_CLOCKPOLARITY_RISING             TIM_INPUTCHANNELPOLARITY_RISING    
-/* TIx时钟源的下降沿极性 */
+/* TIx时钟源的极性：下降沿 */
 #define TIM_CLOCKPOLARITY_FALLING            TIM_INPUTCHANNELPOLARITY_FALLING   
-/* TIx时钟源的双边沿极性 */
+/* TIx时钟源的极性：双边沿 */
 #define TIM_CLOCKPOLARITY_BOTHEDGE           TIM_INPUTCHANNELPOLARITY_BOTHEDGE  
 /**
   * @}
@@ -151,9 +151,9 @@
 /** @defgroup TIM_ClearInput_Polarity TIM Clear Input Polarity
   * @{
   */
-/* ETRx引脚的反极性 */
+/* ETRx引脚极性：反相 */
 #define TIM_CLEARINPUTPOLARITY_INVERTED           TIM_ETRPOLARITY_INVERTED      
-/* ETRx引脚的非反极性 */
+/* ETRx引脚极性：非反相 */
 #define TIM_CLEARINPUTPOLARITY_NONINVERTED        TIM_ETRPOLARITY_NONINVERTED   
 /**
   * @}
@@ -177,9 +177,9 @@
 /** @defgroup TIM_OSSR_Off_State_Selection_for_Run_mode_state TIM OSSR OffState Selection for Run mode state
   * @{
   */
-/* 当不工作时，OC/OCN输出使能（仍由定时器控制） */
+/* 运行模式下，当处于非活动状态时，OC/OCN输出被使能（仍由定时器控制） */
 #define TIM_OSSR_ENABLE                          TIM_BDTR_OSSR                  
-/* 当不工作时，OC/OCN输出禁止（不再由定时器控制） */
+/* 运行模式下，当处于非活动状态时，OC/OCN输出被禁止（不再由定时器控制） */
 #define TIM_OSSR_DISABLE                         0x00000000U                    
 /**
   * @}
@@ -188,9 +188,9 @@
 /** @defgroup TIM_OSSI_Off_State_Selection_for_Idle_mode_state TIM OSSI OffState Selection for Idle mode state
   * @{
   */
-/* 当不工作时，OC/OCN输出使能（仍由定时器控制） */
+/* 空闲模式下，当处于非活动状态时，OC/OCN输出被使能（仍由定时器控制） */
 #define TIM_OSSI_ENABLE                          TIM_BDTR_OSSI                  
-/* 当不工作时，OC/OCN输出禁止（不再由定时器控制） */
+/* 空闲模式下，当处于非活动状态时，OC/OCN输出被禁止（不再由定时器控制） */
 #define TIM_OSSI_DISABLE                         0x00000000U                    
 /**
   * @}
@@ -237,7 +237,7 @@
   */
 /* MOE位只能通过软件设置 */
 #define TIM_AUTOMATICOUTPUT_DISABLE        0x00000000U                          
-/* MOE位可以通过软件设置，或在下一个更新事件时自动设置（如果没有刹车输入BRK和BRK2处于活动状态） */
+/* MOE位可以由软件设置，或在下一个更新事件时自动设置（如果没有刹车输入BRK和BRK2处于活动状态） */
 #define TIM_AUTOMATICOUTPUT_ENABLE         TIM_BDTR_AOE                         
 /**
   * @}
@@ -269,9 +269,9 @@
 /** @defgroup TIM_Master_Slave_Mode TIM Master/Slave Mode
   * @{
   */
-/* 主/从模式被选择 */
+/* 主/从模式使能 */
 #define TIM_MASTERSLAVEMODE_ENABLE         TIM_SMCR_MSM                         
-/* 无动作 */
+/* 主/从模式禁止 */
 #define TIM_MASTERSLAVEMODE_DISABLE        0x00000000U                          
 /**
   * @}
@@ -305,13 +305,13 @@
 #define TIM_OCMODE_INACTIVE                 TIM_CCMR1_OC1M_1                                          
 /* 翻转模式：匹配时翻转输出 */
 #define TIM_OCMODE_TOGGLE                   (TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_0)                    
-/* PWM模式1：向上计数时，CNT<CCR为有效电平，否则为无效电平；向下计数相反 */
+/* PWM模式1：向上计数时，当CNT<CCR时输出有效电平，否则输出无效电平；向下计数时相反 */
 #define TIM_OCMODE_PWM1                     (TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC1M_1)                    
-/* PWM模式2：向上计数时，CNT<CCR为无效电平，否则为有效电平；向下计数相反 */
+/* PWM模式2：向上计数时，当CNT<CCR时输出无效电平，否则输出有效电平；向下计数时相反 */
 #define TIM_OCMODE_PWM2                     (TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_0) 
-/* 强制为有效电平 */
+/* 强制输出为有效电平 */
 #define TIM_OCMODE_FORCED_ACTIVE            (TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC1M_0)                    
-/* 强制为无效电平 */
+/* 强制输出为无效电平 */
 #define TIM_OCMODE_FORCED_INACTIVE          TIM_CCMR1_OC1M_2                                          
 /**
   * @}
@@ -345,15 +345,15 @@
 /** @defgroup TIM_Trigger_Polarity TIM Trigger Polarity
   * @{
   */
-/* ETRx触发源的反极性 */
+/* ETRx触发源的极性：反相 */
 #define TIM_TRIGGERPOLARITY_INVERTED           TIM_ETRPOLARITY_INVERTED               
-/* ETRx触发源的非反极性 */
+/* ETRx触发源的极性：非反相 */
 #define TIM_TRIGGERPOLARITY_NONINVERTED        TIM_ETRPOLARITY_NONINVERTED            
-/* TIxFPx或TI1_ED触发源的上升沿极性 */
+/* TIxFPx或TI1_ED触发源的极性：上升沿 */
 #define TIM_TRIGGERPOLARITY_RISING             TIM_INPUTCHANNELPOLARITY_RISING        
-/* TIxFPx或TI1_ED触发源的下降沿极性 */
+/* TIxFPx或TI1_ED触发源的极性：下降沿 */
 #define TIM_TRIGGERPOLARITY_FALLING            TIM_INPUTCHANNELPOLARITY_FALLING       
-/* TIxFPx或TI1_ED触发源的双边沿极性 */
+/* TIxFPx或TI1_ED触发源的极性：双边沿 */
 #define TIM_TRIGGERPOLARITY_BOTHEDGE           TIM_INPUTCHANNELPOLARITY_BOTHEDGE      
 /**
   * @}

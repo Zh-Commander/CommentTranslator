@@ -1,1 +1,0 @@
-final_chunk_start_line=1, final_chunk_end_line=586, chunk_size=20893

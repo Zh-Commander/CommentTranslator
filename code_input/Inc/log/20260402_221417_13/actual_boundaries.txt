@@ -1,2 +1,0 @@
-split_before_line=544, chunk_start_line=1, chunk_end_line=543, chunk_size=19935, boundary_type=empty
-final_chunk_start_line=544, final_chunk_end_line=638, chunk_size=4269
