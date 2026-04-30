@@ -1,0 +1,6 @@
+code_input/
+code_output/
+temp/
+.claude
+代码注释转中文/
+__pycache__/

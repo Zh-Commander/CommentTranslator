@@ -1,6 +1,0 @@
-split_before_line=350, chunk_start_line=1, chunk_end_line=349, chunk_size=17551, boundary_type=empty
-split_before_line=683, chunk_start_line=350, chunk_end_line=682, chunk_size=19794, boundary_type=empty
-split_before_line=960, chunk_start_line=683, chunk_end_line=959, chunk_size=17360, boundary_type=empty
-split_before_line=1290, chunk_start_line=960, chunk_end_line=1289, chunk_size=19722, boundary_type=empty
-split_before_line=1661, chunk_start_line=1290, chunk_end_line=1660, chunk_size=19751, boundary_type=empty
-final_chunk_start_line=1661, final_chunk_end_line=2153, chunk_size=28554

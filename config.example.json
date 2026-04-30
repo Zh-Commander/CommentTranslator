@@ -1,15 +1,16 @@
 {
-  "api_key_env": "JINGDONG_KEY",
-  "base_url": "https://modelservice.jdcloud.com/coding/openai/v1",
-  "model": "GLM-5",
+  "api_key_env": "OPENAI_API_KEY",
+  "base_url": "https://your-openai-compatible-endpoint/v1",
+  "model": "gpt-4.1",
   "temperature": 0.1,
   "top_p": 1,
-  "timeout": 1400,
-  "max_workers": 10,
+  "timeout": 600,
+  "max_workers": 4,
   "input_dir": "code_input",
   "output_dir": "code_output",
   "split_dir": "temp/code_split",
   "split_output_dir": "temp/code_split_output",
+  "repair_temp_dir": "temp/repair",
   "system_prompt_path": "templates/system_prompt.txt",
   "file_extensions": [".c", ".h", ".cpp"],
   "chunk_threshold_bytes": 20000,
@@ -19,5 +20,10 @@
   "fix_backslash_comments": false,
   "overwrite_output": true,
   "retry_count": 0,
-  "repair_scripts": ["plugins/repairs/fix_backslash_comments.py"]
+  "retry_base_delay_seconds": 1.0,
+  "retry_max_delay_seconds": 30.0,
+  "check_scripts": [],
+  "repair_scripts": ["plugins/repairs/fix_backslash_comments.py"],
+  "max_translate_attempts": 1,
+  "plugin_timeout_seconds": 60
 }
