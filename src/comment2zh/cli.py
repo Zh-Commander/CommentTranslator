@@ -15,7 +15,6 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--output-dir", help="Override output directory")
     parser.add_argument("--workers", type=int, help="Override max workers")
     parser.add_argument("--extensions", nargs="+", help="Override file extensions")
-    parser.add_argument("--skip-fix", action="store_true", help="Skip post-fix for backslash comments")
     parser.add_argument("--dry-run", action="store_true", help="Scan and plan files without calling the model")
     return parser
 
@@ -33,8 +32,6 @@ def main() -> int:
         config.processing.max_workers = max(1, args.workers)
     if args.extensions:
         config.processing.file_extensions = tuple(ext.lower() if ext.startswith(".") else f".{ext.lower()}" for ext in args.extensions)
-    if args.skip_fix:
-        config.processing.fix_backslash_comments = False
 
     pipeline = Pipeline(config)
     return pipeline.run(dry_run=args.dry_run)

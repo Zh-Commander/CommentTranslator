@@ -5,3 +5,8 @@ temp/
 代码注释转中文/
 __pycache__/
 config.json
+config.jingdong.json
+config_deepseek.json
+config_kimicode_kz.json
+STM32G4xx_HAL_Driver.7z
+STM32G4xx_HAL_Driver_dstest.zip

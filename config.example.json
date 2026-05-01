@@ -17,13 +17,13 @@
   "chunk_max_bytes": 20000,
   "chunk_min_bytes": 10000,
   "encoding": "utf-8",
-  "fix_backslash_comments": false,
   "overwrite_output": true,
   "retry_count": 0,
   "retry_base_delay_seconds": 1.0,
   "retry_max_delay_seconds": 30.0,
   "check_scripts": [],
   "repair_scripts": ["plugins/repairs/fix_backslash_comments.py"],
+  "notify_scripts": [],
   "max_translate_attempts": 1,
   "plugin_timeout_seconds": 60
 }

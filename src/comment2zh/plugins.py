@@ -26,8 +26,15 @@ class RepairResult:
     changed_files: int = 0
 
 
+@dataclass(slots=True)
+class NotifyResult:
+    passed: bool
+    message: str = ""
+
+
 CheckFunction = Callable[[str, str], bool]
 RepairFunction = Callable[[str, str], bool]
+NotifyFunction = Callable[[dict], bool]
 
 
 def _load_module(script_path: Path) -> ModuleType:
@@ -53,7 +60,7 @@ def _get_function(module: ModuleType, names: tuple[str, ...], script_path: Path)
     raise PluginError(f"plugin {script_path} must define one of: {joined_names}")
 
 
-def _call_with_timeout(function: Callable[..., bool], args: tuple[str, str], timeout_seconds: float | None) -> bool:
+def _call_with_timeout(function: Callable[..., bool], args: tuple, timeout_seconds: float | None) -> bool:
     if timeout_seconds is None:
         return function(*args)
 
@@ -166,3 +173,48 @@ class RepairPluginRunner:
             if self.run_file(file_path, output_root):
                 changed_files += 1
         return RepairResult(changed_files=changed_files)
+
+
+@dataclass(slots=True)
+class NotificationPlugin:
+    script_path: Path
+    function: NotifyFunction
+    timeout_seconds: float | None
+
+    def run(self, task_info: dict) -> NotifyResult:
+        try:
+            result = _call_with_timeout(
+                self.function,
+                (dict(task_info),),
+                self.timeout_seconds,
+            )
+        except Exception as exc:  # noqa: BLE001
+            message = f"{self.script_path}: {exc}"
+            print(f"[notification] failed: {message}")
+            return NotifyResult(False, message)
+
+        if result is True:
+            print(f"[notification] succeeded: {self.script_path}")
+            return NotifyResult(True)
+
+        message = f"{self.script_path}: returned {result!r}"
+        print(f"[notification] failed: {message}")
+        return NotifyResult(False, message)
+
+
+class NotificationPluginRunner:
+    def __init__(self, script_paths: tuple[Path, ...], timeout_seconds: float | None):
+        self.timeout_seconds = timeout_seconds
+        self.plugins = tuple(self._load_plugin(path) for path in script_paths)
+
+    def _load_plugin(self, script_path: Path) -> NotificationPlugin:
+        module = _load_module(script_path)
+        function = _get_function(module, ("notify", "main"), script_path)
+        return NotificationPlugin(script_path=script_path, function=function, timeout_seconds=self.timeout_seconds)
+
+    def run(self, task_info: dict) -> NotifyResult:
+        for plugin in self.plugins:
+            result = plugin.run(task_info)
+            if not result.passed:
+                return result
+        return NotifyResult(True)

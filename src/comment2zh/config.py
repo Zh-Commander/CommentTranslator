@@ -60,7 +60,6 @@ def load_config(config_path: str | Path | None = None) -> AppConfig:
     chunk_threshold = int(raw.get("chunk_threshold_bytes", raw.get("Large_file_split_threshold", 20000)))
     chunk_max = int(raw.get("chunk_max_bytes", raw.get("split_max_token", 20000)))
     chunk_min = int(raw.get("chunk_min_bytes", raw.get("split_min_token", 10000)))
-    fix_backslash = bool(raw.get("fix_backslash_comments", raw.get("isFixBackSlash", True)))
 
     openai = OpenAISettings(
         api_key_env=str(raw.get("api_key_env", "OPENAI_API_KEY")),
@@ -89,7 +88,6 @@ def load_config(config_path: str | Path | None = None) -> AppConfig:
         chunk_threshold_bytes=chunk_threshold,
         chunk_max_bytes=chunk_max,
         chunk_min_bytes=chunk_min,
-        fix_backslash_comments=fix_backslash,
         overwrite_output=bool(raw.get("overwrite_output", True)),
         preserve_input_encoding=bool(raw.get("preserve_input_encoding", False)),
         retry_count=max(0, int(raw.get("retry_count", 0))),
@@ -100,6 +98,7 @@ def load_config(config_path: str | Path | None = None) -> AppConfig:
     plugins = PluginSettings(
         check_scripts=_resolve_path_list(project_root, raw.get("check_scripts", []), "check_scripts"),
         repair_scripts=_resolve_path_list(project_root, raw.get("repair_scripts", []), "repair_scripts"),
+        notify_scripts=_resolve_path_list(project_root, raw.get("notify_scripts", []), "notify_scripts"),
         max_translate_attempts=max(1, int(raw.get("max_translate_attempts", 1))),
         plugin_timeout_seconds=_optional_timeout(raw.get("plugin_timeout_seconds", 60)),
     )

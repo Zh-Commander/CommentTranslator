@@ -61,7 +61,17 @@ class OpenAIClient:
         for attempt in range(1, attempts + 1):
             try:
                 response = self._client.chat.completions.create(**request_kwargs)
-                return response.choices[0].message.content or ""
+                try:
+                    return response.choices[0].message.content or ""
+                except (AttributeError, IndexError, TypeError) as exc:
+                    response_preview = repr(response)
+                    if len(response_preview) > 1000:
+                        response_preview = response_preview[:1000] + "..."
+                    print(
+                        "Unexpected API response format: "
+                        f"type={type(response).__name__}, response={response_preview}"
+                    )
+                    raise RuntimeError("unexpected API response format") from exc
             except Exception as exc:  # noqa: BLE001
                 last_error = exc
                 if attempt == attempts or not self._should_retry(exc):

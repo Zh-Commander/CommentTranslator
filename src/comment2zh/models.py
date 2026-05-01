@@ -35,7 +35,6 @@ class ProcessingSettings:
     chunk_threshold_bytes: int
     chunk_max_bytes: int
     chunk_min_bytes: int
-    fix_backslash_comments: bool = True
     overwrite_output: bool = True
     preserve_input_encoding: bool = False
     retry_count: int = 0
@@ -47,6 +46,7 @@ class ProcessingSettings:
 class PluginSettings:
     check_scripts: tuple[Path, ...]
     repair_scripts: tuple[Path, ...]
+    notify_scripts: tuple[Path, ...]
     max_translate_attempts: int = 1
     plugin_timeout_seconds: float | None = 60.0
 

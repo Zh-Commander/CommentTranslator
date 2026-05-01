@@ -7,7 +7,7 @@
 完整流程如下：
 
 ```text
-扫描 -> 切分/复制 -> AI 翻译 -> 检查/失败重译 -> 合并 -> 修复插件链
+扫描 -> 切分/复制 -> AI 翻译 -> 检查/失败重译 -> 合并 -> 修复插件链 -> 通知插件链
 ```
 
 各阶段说明：
@@ -41,6 +41,11 @@
    - 每个修复插件读取上一步输出，并写入自己的输出文件。
    - 最后一个修复结果覆盖回 `output_dir` 中的最终文件。
 
+7. **通知插件链**
+   - 整个任务可控结束后，会依次运行 `notify_scripts` 中的通知插件。
+   - 通知插件收到统一的任务信息字典，可用于打印摘要、写日志或发送外部通知。
+   - 通知插件失败只打印错误，不改变主任务退出码。
+
 ## 目录结构
 
 ```text
@@ -58,7 +63,8 @@
 │   └── system_prompt.txt           # 系统提示词模板
 ├── plugins/
 │   ├── checks/                     # 推荐放检查插件
-│   └── repairs/                    # 推荐放修复插件
+│   ├── repairs/                    # 推荐放修复插件
+│   └── notifications/              # 推荐放通知插件
 └── src/comment2zh/
     ├── cli.py                      # CLI 参数解析
     ├── config.py                   # 配置加载与路径解析
@@ -150,10 +156,7 @@ python main.py [run] [options]
 | `--output-dir` | 覆盖配置中的输出目录 |
 | `--workers` | 覆盖并发线程数 |
 | `--extensions` | 覆盖处理扩展名，例如 `--extensions .c .h` |
-| `--skip-fix` | 兼容旧参数，会把 `fix_backslash_comments` 设为 false |
 | `--dry-run` | 只扫描和统计，不调用模型 |
-
-注意：当前修复能力已经插件化，推荐通过 `repair_scripts` 控制修复脚本，而不是依赖 `--skip-fix`。
 
 ## 配置说明
 
@@ -179,13 +182,13 @@ python main.py [run] [options]
   "chunk_max_bytes": 20000,
   "chunk_min_bytes": 10000,
   "encoding": "utf-8",
-  "fix_backslash_comments": false,
   "overwrite_output": true,
   "retry_count": 0,
   "retry_base_delay_seconds": 1.0,
   "retry_max_delay_seconds": 30.0,
   "check_scripts": [],
   "repair_scripts": ["plugins/repairs/fix_backslash_comments.py"],
+  "notify_scripts": [],
   "max_translate_attempts": 1,
   "plugin_timeout_seconds": 60
 }
@@ -256,6 +259,7 @@ python main.py [run] [options]
 |---|---|
 | `check_scripts` | 检查插件脚本列表 |
 | `repair_scripts` | 修复插件脚本列表 |
+| `notify_scripts` | 通知插件脚本列表，在整个任务可控结束后按顺序执行 |
 | `max_translate_attempts` | 检查失败后整文件重新翻译的最大尝试次数 |
 | `plugin_timeout_seconds` | 单个插件调用超时时间；小于等于 0 或 `null` 表示不限制 |
 
@@ -392,9 +396,146 @@ def repair(input_path: str, output_path: str) -> bool:
     return True
 ```
 
-## 反斜杠修复插件
+## 通知插件开发
 
-宏续行中的反斜杠位置对 C 预处理语法很敏感。项目提供了一个普通修复插件：
+通知插件用于在整个任务可控结束后执行通知类副作用，例如打印摘要、写日志、发送 Webhook、弹出系统通知或调用外部脚本。
+
+插件文件推荐放在：
+
+```text
+plugins/notifications/
+```
+
+然后写入 `config.json`：
+
+```json
+"notify_scripts": [
+  "plugins/notifications/print_summary.py"
+]
+```
+
+### 函数协议
+
+通知插件需要定义 `notify()` 或 `main()`：
+
+```python
+def notify(task_info: dict) -> bool:
+    return True
+```
+
+返回值：
+
+- 必须严格返回 `True` 才视为通知成功。
+- 返回其他值或抛异常会被记录为通知失败。
+- 通知失败只打印错误，不改变主任务退出码。
+- 通知插件由 `NotificationPluginRunner` 按 `notify_scripts` 顺序执行。
+- 每个通知插件收到的是 `task_info` 的浅拷贝，避免插件修改顶层字段影响后续插件。
+- 如果某个通知插件失败，通知链会停止执行，但主任务退出码保持不变。
+
+### 执行时机
+
+通知插件只在 `Pipeline.run()` 中的可控结束路径执行，包括：
+
+- 未扫描到匹配文件。
+- `--dry-run` 扫描完成。
+- 翻译阶段存在失败文件，主任务返回 `1`。
+- 翻译、合并、修复全部成功，主任务返回 `0`。
+
+当前不会捕获所有异常来强制发送通知。例如配置加载失败、文件系统异常、修复插件异常等仍会按原有方式抛出。若后续需要“异常崩溃也通知”，应单独设计全局异常通知入口，不要直接吞掉现有异常。
+
+### 执行日志
+
+通知插件框架会统一打印每个通知插件的执行结果：
+
+```text
+[notification] succeeded: plugins/notifications/example.py
+[notification] failed: plugins/notifications/example.py: returned False
+```
+
+插件自身也可以 `print()` 输出更细的执行细节。维护时建议通知插件至少在跳过、降级或外部命令失败时打印原因。
+
+### `task_info` 字段
+
+通知插件统一接收一个字典，常用字段如下：
+
+| 字段 | 说明 |
+|---|---|
+| `status` | `success` 或 `failed` |
+| `exit_code` | 主任务原始退出码 |
+| `dry_run` | 是否为 dry-run |
+| `message` | 任务结果摘要 |
+| `input_dir` | 输入目录 |
+| `output_dir` | 输出目录 |
+| `split_dir` | 切分/复制后的待翻译目录 |
+| `split_output_dir` | AI 翻译后输出目录 |
+| `repair_temp_dir` | 修复插件中间目录，可能为 `None` |
+| `log_dir` | 切分日志目录，可能为 `None` |
+| `file_extensions` | 处理的文件扩展名列表 |
+| `encoding` | 文件编码 |
+| `max_workers` | 并发线程数 |
+| `input_file_count` | 输入文件数量 |
+| `prepared_file_count` | 实际待翻译文件数量 |
+| `copied_count` | 直接复制到待翻译目录的文件数量 |
+| `split_count` | 被切分的源文件数量 |
+| `translated_file_count` | 成功翻译的待翻译文件数量 |
+| `merged_file_count` | 合并/复制到最终输出的文件数量 |
+| `repaired_file_count` | 经过修复插件链处理的文件数量 |
+| `failed_files` | 翻译失败文件列表，元素包含 `file_path` 和 `error` |
+
+### 示例：打印任务摘要
+
+项目提供了一个极简摘要插件：
+
+```text
+plugins/notifications/print_summary.py
+```
+
+核心逻辑：
+
+```python
+def notify(task_info: dict) -> bool:
+    print(f"[notification] {task_info['status']}: {task_info['message']}")
+    return True
+```
+
+启用方式：
+
+```json
+"notify_scripts": ["plugins/notifications/print_summary.py"]
+```
+
+### 示例：Windows 右下角弹窗通知
+
+项目提供了 Windows 托盘气泡通知插件：
+
+```text
+plugins/notifications/windows_toast.py
+```
+
+启用方式：
+
+```json
+"notify_scripts": ["plugins/notifications/windows_toast.py"]
+```
+
+如果希望同时打印摘要和弹窗通知：
+
+```json
+"notify_scripts": [
+  "plugins/notifications/print_summary.py",
+  "plugins/notifications/windows_toast.py"
+]
+```
+
+维护说明：
+
+- 该插件仅在 Windows 系统上实际弹窗。
+- 非 Windows 系统会打印跳过原因并返回 `True`，避免影响主流程。
+- 插件通过 PowerShell 调用 `System.Windows.Forms.NotifyIcon` 显示托盘气泡。
+- 失败任务使用错误图标，成功任务使用信息图标。
+- PowerShell 子进程有独立超时，外层仍受 `plugin_timeout_seconds` 控制。
+- 早期 WinRT Toast API 方案可能出现“脚本成功但不弹窗”，因为未注册有效 AppUserModelID；当前实现改用托盘气泡以提高可靠性。
+
 
 ```text
 plugins/repairs/fix_backslash_comments.py
@@ -404,12 +545,6 @@ plugins/repairs/fix_backslash_comments.py
 
 ```json
 "repair_scripts": ["plugins/repairs/fix_backslash_comments.py"]
-```
-
-`fix_backslash_comments` 字段目前只作为旧配置兼容字段保留，推荐设置为：
-
-```json
-"fix_backslash_comments": false
 ```
 
 维护时不要再向 `pipeline.py` 或 `plugins.py` 添加新的内置修复逻辑。新增修复能力应优先实现为 `plugins/repairs/` 下的普通插件。
@@ -427,6 +562,7 @@ plugins/repairs/fix_backslash_comments.py
 3. `FileTranslator.run()`
 4. `merge_split_output_files()`
 5. `RepairPluginRunner.run()`
+6. `NotificationPluginRunner.run()`
 
 维护原则：
 
@@ -481,13 +617,15 @@ plugins/repairs/fix_backslash_comments.py
 
 ### `src/comment2zh/plugins.py`
 
-负责插件动态加载、超时控制、检查插件链和修复插件链。
+负责插件动态加载、超时控制、检查插件链、修复插件链和通知插件链。
 
 维护原则：
 
-- 插件协议要保持简单：路径字符串入参，布尔返回值。
+- 插件协议要保持简单：路径字符串或任务信息字典入参，布尔返回值。
 - 检查插件失败不应直接终止整个流程，而是触发当前文件重译，直到达到上限。
 - 修复插件失败应终止流程，因为最终输出可能不完整。
+- 通知插件失败只记录日志，不应改变主任务退出码。
+- 通知插件框架负责打印每个通知插件的成功/失败状态，插件自身负责打印更具体的外部调用细节。
 
 ## Prompt 维护
 
@@ -565,6 +703,35 @@ def repair(input_path: str, output_path: str) -> bool:
 ```
 
 用它验证修复链路径传递是否正常。
+
+### 通知插件验证
+
+启用摘要通知插件：
+
+```json
+"notify_scripts": ["plugins/notifications/print_summary.py"]
+```
+
+运行 dry-run：
+
+```bash
+python "F:/Python_Project/代码注释转中文新/main.py" --dry-run
+```
+
+期望看到类似输出：
+
+```text
+[notification] success: Found 1 file(s). 1 file(s) will be split.
+[notification] succeeded: .../plugins/notifications/print_summary.py
+```
+
+启用 Windows 弹窗通知插件：
+
+```json
+"notify_scripts": ["plugins/notifications/windows_toast.py"]
+```
+
+在 Windows 桌面会话中运行任务后，期望右下角出现托盘气泡通知，同时控制台输出通知插件执行结果。
 
 ## 常见问题
 
